@@ -73,7 +73,7 @@
                                     {% if card.description is not empty %}<div class="text-muted small mt-1">{{ card.description }}</div>{% endif %}
                                 </div>
                                 {# The switch, then the arrow at the very right. #}
-                                <span class="ps-switch ps-switch-lg ps-switch-nolabel ml-3 peb-settings__switch" title="{{ texts.switchHelp }}" aria-label="{{ texts.switch }}">
+                                <span class="ps-switch ps-switch-nolabel ml-3 peb-settings__switch" title="{{ texts.switchHelp }}" aria-label="{{ texts.switch }}">
                                     <input type="radio" name="peb-menu-{{ loop.index }}" id="peb-menu-{{ loop.index }}-off" value="0"{% if not card.shown %} checked{% endif %}>
                                     <label for="peb-menu-{{ loop.index }}-off">{{ texts.no }}</label>
                                     <input type="radio" name="peb-menu-{{ loop.index }}" id="peb-menu-{{ loop.index }}-on" value="1"{% if card.shown %} checked{% endif %}>
