@@ -8,7 +8,7 @@
 
 | | PrestaShop 8 | PrestaShop 9 |
 |---|---|---|
-| Back office look | PrestaShop 9 stylesheets, shipped in the module, replace the PrestaShop 8 ones | unchanged: PrestaShop 9 already has it |
+| Back office look | PrestaShop 9 stylesheets, shipped in the module, replace the PrestaShop 8 ones; the login page gets the PrestaShop 9 look from a stylesheet of its own | unchanged: PrestaShop 9 already has it |
 | Simplified menu | optional, switched on in the module configuration | optional, switched on in the module configuration |
 | Settings page | cards for the sections the simplified menu leaves out | same |
 

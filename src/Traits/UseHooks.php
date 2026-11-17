@@ -28,6 +28,7 @@ trait UseHooks
     use Hooks\UseActionAdminBreadcrumbModifier;
     use Hooks\UseActionObjectLanguageAddAfter;
     use Hooks\UseActionAdminControllerSetMedia;
+    use Hooks\UseActionAdminLoginControllerSetMedia;
     use Hooks\UseDisplayBackOfficeHeader;
     use Hooks\UseDisplayAdminNavBarBeforeEnd;
     use Hooks\UseDisplayDashboardTop;

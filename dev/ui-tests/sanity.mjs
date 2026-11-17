@@ -138,6 +138,13 @@ const lookChecks = async () => {
 
 const signedIn = await check('sign in to the back office', async () => {
     await page.goto(adminUrl);
+    // The login page skips the back office media: on PrestaShop 8 the module
+    // gives it the PrestaShop 9 look with a stylesheet of its own.
+    const loginStyle = await page.locator('link[href*="/modules/ps_edition_basic/views/css/login.css"]').count();
+    if (isPs8 !== (loginStyle > 0)) {
+        throw new Error(isPs8 ? 'the login page misses the PrestaShop 9 look' : 'the module styles the PrestaShop 9 login page');
+    }
+    await view('0-login');
     await page.locator('input[type="email"]').first().fill(email);
     await page.locator('input[type="password"]').first().fill(password);
     await Promise.all([
