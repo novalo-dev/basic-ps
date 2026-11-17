@@ -125,6 +125,24 @@ jobs:
           docker exec shop chown -R www-data:www-data /var/www/html/modules/ps_mbo
           docker exec -u www-data -w /var/www/html shop php bin/console prestashop:module install ps_mbo
 
+      # PrestaShop Checkout draws its configuration page outside PrestaShop's
+      # bootstrap frame, with an app of its own: the page every shop with
+      # Checkout opens, and the one the PrestaShop 9 look has to hold up on.
+      # Release builds, which carry their dependencies; its app needs
+      # PrestaShop Account installed to show.
+      - name: PrestaShop Checkout
+        if: matrix.major == '8'
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/ps_accounts.zip" https://github.com/PrestaShopCorp/ps_accounts/releases/download/v8.0.17/ps_accounts-8.0.17.zip
+          curl -fsSL -o "$RUNNER_TEMP/ps_checkout.zip" https://github.com/PrestaShopCorp/ps_checkout/releases/download/v5.5.6/ps_checkout-v8.5.5.6.zip
+          for name in ps_accounts ps_checkout; do
+            rm -rf "${RUNNER_TEMP:?}/$name" && mkdir -p "$RUNNER_TEMP/$name"
+            unzip -q "$RUNNER_TEMP/$name.zip" -d "$RUNNER_TEMP/$name"
+            docker cp "$RUNNER_TEMP/$name/$name" shop:/var/www/html/modules/$name
+            docker exec shop chown -R www-data:www-data /var/www/html/modules/$name
+            docker exec -u www-data -w /var/www/html shop php -d memory_limit=-1 bin/console prestashop:module install $name
+          done
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'

@@ -214,6 +214,11 @@ const lookChecks = async () => {
             .filter((element) => shown(element) && ['fixed', 'sticky'].includes(getComputedStyle(element).position));
         const headerBottom = Math.max(0, ...header.map((element) => element.getBoundingClientRect().bottom));
         const covered = [];
+        // Desktop only: on a phone the menu is a panel that opens over the page.
+        const menu = document.querySelector('.nav-bar');
+        const menuBox = menu && shown(menu) ? menu.getBoundingClientRect() : null;
+        const menuRight = menuBox && menuBox.left >= 0 && innerWidth >= 1024 ? menuBox.right : 0;
+        const underMenu = [];
         const area = document.querySelector('.content-div') || document.querySelector('#content');
         for (const element of area ? area.querySelectorAll('*') : []) {
             if (covered.length > 4 || !shown(element) || element.closest('.header-toolbar, .page-head, .main-header, #header, .nav-bar, .modal, .dropdown-menu, [role="dialog"], .growl, #ajax_confirmation, script, style')) {
@@ -239,7 +244,33 @@ const lookChecks = async () => {
             if (painted && box.top < headerBottom - 1) {
                 covered.push(`${element.tagName.toLowerCase()} "${element.textContent.trim().slice(0, 30)}" (${Math.round(headerBottom - box.top)}px)`);
             }
+            if (painted && menuRight > 0 && box.left < menuRight - 1 && underMenu.length < 5) {
+                underMenu.push(`${element.tagName.toLowerCase()} "${element.textContent.trim().slice(0, 30)}" (${Math.round(menuRight - box.left)}px)`);
+            }
         }
+        // The page header spans the whole width behind the menu: only its texts count.
+        for (const element of document.querySelectorAll('.page-head *, .header-toolbar *')) {
+            const box = element.getBoundingClientRect();
+            const text = [...element.childNodes].some((node) => node.nodeType === 3 && node.textContent.trim());
+            if (text && shown(element) && menuRight > 0 && box.left < menuRight - 1 && box.right > menuRight && underMenu.length < 5) {
+                underMenu.push(`${element.tagName.toLowerCase()} "${element.textContent.trim().slice(0, 30)}" (${Math.round(menuRight - box.left)}px)`);
+            }
+        }
+        // Scroll bars the page should not have: sideways on the whole page, or on a
+        // block whose content does not fit, other than the ones made to scroll.
+        const sideways = Math.round(document.documentElement.scrollWidth - innerWidth);
+        const scrollBars = [...document.querySelectorAll('#main *')]
+            .filter((element) => {
+                if (!shown(element) || element.closest('.nav-bar, .modal, .dropdown-menu, .table-responsive, textarea, select, pre, code, .select2-results, .CodeMirror, .tree-panel-heading-controls')) {
+                    return false;
+                }
+                const style = getComputedStyle(element);
+                const across = /(auto|scroll)/.test(style.overflowX) && element.scrollWidth > element.clientWidth + 1;
+                const down = /(auto|scroll)/.test(style.overflowY) && element.scrollHeight > element.clientHeight + 1;
+                return (across || down) && (element.offsetWidth - element.clientWidth > 0 || element.offsetHeight - element.clientHeight > 0);
+            })
+            .slice(0, 5)
+            .map((element) => `${element.tagName.toLowerCase()}${element.id ? '#' + element.id : ''}.${[...element.classList].slice(0, 2).join('.')}`);
         // PrestaShop 9 fills btn-outline-primary in grey; PrestaShop 8 secondary
         // actions use it and must stay white, as btn-outline-secondary in 9.
         const grey = [...document.querySelectorAll('.btn-outline-primary')]
@@ -278,10 +309,13 @@ const lookChecks = async () => {
                 invisible.push(`"${text.textContent.trim().slice(0, 30)}"`);
             }
         }
-        return { sheets, notice: notice ? getComputedStyle(notice).display : 'none', wordIcons, gap, gapBlock, covered, invisible, grey };
+        return { sheets, notice: notice ? getComputedStyle(notice).display : 'none', wordIcons, gap, gapBlock, covered, invisible, grey, underMenu, sideways, scrollBars };
     });
     const clashes = [
         ...state.covered.map((what) => `under the header: ${what}`),
+        ...state.underMenu.map((what) => `under the menu: ${what}`),
+        ...(state.sideways > 1 ? [`the page scrolls sideways by ${state.sideways}px`] : []),
+        ...state.scrollBars.map((what) => `a scroll bar on ${what}`),
         ...state.invisible.map((what) => `text the colour of its background: ${what}`),
     ];
     if (clashes.length > 0 && !isPs8) {
@@ -367,6 +401,13 @@ if (signedIn) {
         for (const [href, name] of configurePages.slice(0, 120)) {
             await check(`module ${name}`, async () => {
                 await open(href);
+                // Checkout draws its page with an app loaded after the page: the
+                // view and the checks wait for it, as the merchant does.
+                if (name === 'ps_checkout') {
+                    await page.locator('#app > *').first().waitFor({ state: 'visible', timeout: 30000 }).catch(() => {});
+                    await page.waitForTimeout(3000);
+                    await view('8-checkout');
+                }
                 await lookChecks();
             });
         }
