@@ -65,19 +65,23 @@ body:not(.display-modal) #content.bootstrap.with-tabs {
  * padding: blocks against its left edge went under the menu. Its top padding
  * reserved 110px for the page header, which is now in the page, and its 1200px
  * minimum, wider than the space beside the menu, made the page scroll sideways.
+ * The apps of PrestaShop's own modules (Checkout, Account) load a stylesheet that
+ * sets this frame's padding again for a fixed page header (90px above, 10px on the
+ * left): these values are forced, so the page header in the page lines up with
+ * them and the apps keep the width the frame gives them.
  */
 body:not(.display-modal) #content.nobootstrap {
-  min-width: 0;
-  margin-left: var(--cdk-sidebar-width);
-  padding-top: 0;
+  min-width: 0 !important;
+  margin-left: var(--cdk-sidebar-width) !important;
+  padding: 0 30px 100px !important;
 }
 
 .page-sidebar-closed:not(.mobile) #content.nobootstrap {
-  margin-left: var(--cdk-sidebar-width-collapse);
+  margin-left: var(--cdk-sidebar-width-collapse) !important;
 }
 
 .mobile #content.nobootstrap {
-  margin-left: 0;
+  margin-left: 0 !important;
 }
 
 /* Its wrapper also holds the messages some pages print under the header: it gives
