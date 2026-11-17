@@ -186,12 +186,12 @@ const lookChecks = async () => {
                 && icon.getBoundingClientRect().width > parseFloat(getComputedStyle(icon).fontSize) * 1.6)
             .map((icon) => icon.textContent.trim());
         // A module's configuration page has two page headers, only the last shown.
-        const head = [...document.querySelectorAll('#content.bootstrap .page-head')].filter((element) => element.getBoundingClientRect().height > 0).pop();
+        const head = [...document.querySelectorAll('#content:is(.bootstrap, .nobootstrap) .page-head')].filter((element) => element.getBoundingClientRect().height > 0).pop();
         let gap = null;
         let gapBlock = '';
         if (head && !document.body.classList.contains('display-modal')) {
             const bottom = head.getBoundingClientRect().bottom;
-            const blocks = [...document.querySelectorAll('#content.bootstrap .panel, #content.bootstrap .alert, #content.bootstrap form, #content.bootstrap .row')]
+            const blocks = [...document.querySelectorAll('#content .panel, #content .alert, #content form, #content .row, #content #app')]
                 .filter((block) => !block.closest('.page-head') && block.getBoundingClientRect().height > 10)
                 .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
             if (blocks.length) {
@@ -211,7 +211,7 @@ const lookChecks = async () => {
         // border), not only the middle of a text: a block whose top edge slips under
         // the header is caught too.
         const header = [...document.querySelectorAll('.header-toolbar, .page-head, .main-header, #header')]
-            .filter((element) => shown(element) && ['fixed', 'sticky'].includes(getComputedStyle(element.closest('.bootstrap:has(> .page-head)') || element).position));
+            .filter((element) => shown(element) && ['fixed', 'sticky'].includes(getComputedStyle(element).position));
         const headerBottom = Math.max(0, ...header.map((element) => element.getBoundingClientRect().bottom));
         const covered = [];
         const area = document.querySelector('.content-div') || document.querySelector('#content');

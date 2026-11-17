@@ -57,13 +57,34 @@ body:not(.display-modal) #content.bootstrap.with-tabs {
   padding-top: 0;
 }
 
+/*
+ * Some modules render their configuration page outside PrestaShop's bootstrap
+ * frame (PrestaShop Checkout among them): the content is then #content.nobootstrap,
+ * which the PrestaShop 9 stylesheet still sizes for PrestaShop 1.6, with 110px
+ * reserved above and 200px on the left against a 13rem menu. It gets the same
+ * frame as every other page.
+ */
+body:not(.display-modal) #content.nobootstrap {
+  min-width: 0;
+  margin-left: 0;
+  padding: 0 var(--cdk-size-16) var(--cdk-size-16) calc(var(--cdk-sidebar-width) + var(--cdk-size-16));
+}
+
+.page-sidebar-closed:not(.mobile) #content.nobootstrap {
+  padding-left: calc(var(--cdk-sidebar-width-collapse) + var(--cdk-size-16));
+}
+
+.mobile #content.nobootstrap {
+  padding-left: var(--cdk-size-16);
+}
+
 /* Its wrapper also holds the messages some pages print under the header: it gives
    up its box, so only the header sticks, against the whole page. */
-body:not(.display-modal) #content.bootstrap > .bootstrap:has(> .page-head) {
+body:not(.display-modal) #content:is(.bootstrap, .nobootstrap) > .bootstrap:has(> .page-head) {
   display: contents;
 }
 
-body:not(.display-modal) #content.bootstrap > .bootstrap > .page-head {
+body:not(.display-modal) #content:is(.bootstrap, .nobootstrap) > .bootstrap > .page-head {
   position: sticky;
   top: var(--cdk-header-height);
   left: auto;
@@ -71,17 +92,17 @@ body:not(.display-modal) #content.bootstrap > .bootstrap > .page-head {
   margin: 0 calc(-1 * var(--cdk-size-16)) var(--cdk-size-16) calc(-1 * (var(--cdk-sidebar-width) + var(--cdk-size-16)));
 }
 
-.page-sidebar-closed:not(.mobile) #content.bootstrap > .bootstrap > .page-head {
+.page-sidebar-closed:not(.mobile) #content:is(.bootstrap, .nobootstrap) > .bootstrap > .page-head {
   margin-left: calc(-1 * (var(--cdk-sidebar-width-collapse) + var(--cdk-size-16)));
 }
 
-.mobile #content.bootstrap > .bootstrap > .page-head {
+.mobile #content:is(.bootstrap, .nobootstrap) > .bootstrap > .page-head {
   margin-left: calc(-1 * var(--cdk-size-16));
 }
 
 /* A module's configuration page draws the module manager's header, then its own
    over it: only the module's shows, as when both were fixed. */
-body:not(.display-modal) #content.bootstrap > .bootstrap:has(~ .bootstrap > .page-head) > .page-head {
+body:not(.display-modal) #content:is(.bootstrap, .nobootstrap) > .bootstrap:has(~ .bootstrap > .page-head) > .page-head {
   display: none;
 }
 
