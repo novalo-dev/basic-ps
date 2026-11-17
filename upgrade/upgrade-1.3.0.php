@@ -27,7 +27,7 @@ if (!defined('_PS_VERSION_')) {
  * them too. Rights granted until now stay as they are; Team > Permissions is
  * where they are changed.
  */
-function upgrade_module_1_2_20(ps_edition_basic $module): bool
+function upgrade_module_1_3_0(ps_edition_basic $module): bool
 {
     $module->unregisterHook('actionObjectEmployeeAddAfter');
     $module->unregisterHook('actionObjectEmployeeUpdateAfter');
