@@ -80,7 +80,8 @@
                                     <label for="peb-menu-{{ loop.index }}-on">{{ texts.yes }}</label>
                                     <span class="slide-button"></span>
                                 </span>
-                                {% if card.links is not empty %}<i class="material-icons text-muted ml-2" aria-hidden="true">chevron_right</i>{% endif %}
+                                {# Every card leads somewhere: its pages, or the module's own page. #}
+                                <i class="material-icons text-muted ml-2" aria-hidden="true">chevron_right</i>
                             </div>
                         </div>
                     </div>
