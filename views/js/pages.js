@@ -65,9 +65,34 @@
     show(window.location.hash.replace(/^#/, '') || 'home', wait);
   }
 
-  document.addEventListener('DOMContentLoaded', function () {
+  // The script can arrive after the page is parsed, when DOMContentLoaded has
+  // already fired: the first view is then set up straight away.
+  function ready(run) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run);
+    } else {
+      run();
+    }
+  }
+
+  ready(function () {
     fromAddress(false);
   });
+
+  // The back office's own tooltips explain the switches: pstooltip, its name for
+  // Bootstrap's, since jQuery UI takes the name tooltip on these pages. Its
+  // scripts load after this one, so the tooltips wait for the whole page;
+  // without them the title stays, which the browser shows on its own.
+  function tooltips() {
+    if (window.jQuery && window.jQuery.fn.pstooltip) {
+      window.jQuery('#peb-menu-modules .peb-settings__switch').pstooltip({ placement: 'top' });
+    }
+  }
+  if (document.readyState === 'complete') {
+    tooltips();
+  } else {
+    window.addEventListener('load', tooltips);
+  }
   window.addEventListener('hashchange', function () {
     fromAddress(true);
   });

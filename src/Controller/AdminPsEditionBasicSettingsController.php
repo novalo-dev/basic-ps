@@ -53,6 +53,7 @@ class AdminPsEditionBasicSettingsController extends AdminPsEditionBasicControlle
                 'modulesTitle' => $this->translate('Modules'),
                 'modulesDescription' => $this->translate('Choose the module pages shown in the menu.'),
                 'switch' => $this->translate('Show in the menu'),
+                'switchHelp' => $this->translate('Adds the pages of this module to the menu on the left. Its own pages stay reachable here either way.'),
                 'error' => $this->translate('The change could not be saved. Reload the page and try again.'),
                 // PrestaShop's own words for its switches, in every language it ships.
                 'yes' => $this->getService('translator')->trans('Yes', [], 'Admin.Global'),

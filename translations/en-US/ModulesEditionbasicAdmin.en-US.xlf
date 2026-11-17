@@ -212,6 +212,11 @@
         <target state="translated">PrestaShop Edition Basic.</target>
         <note>Line: </note>
       </trans-unit>
+      <trans-unit id="dfe6d43c09a98e8202ddbe00943f2a59">
+        <source>Adds the pages of this module to the menu on the left. Its own pages stay reachable here either way.</source>
+        <target state="translated">Adds the pages of this module to the menu on the left. Its own pages stay reachable here either way.</target>
+        <note>Line: </note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
