@@ -718,10 +718,6 @@ if (signedIn) {
             console.log('no module page on this shop: nothing to switch');
             return;
         }
-        // The module pages are a view of their own, opened from their section card.
-        await page.locator('#peb-settings [data-peb-open="modules"]').click();
-        await page.locator('#peb-menu-modules:not([hidden])').waitFor({ state: 'visible', timeout: 5000 });
-
         const card = cards.first();
         const name = (await card.locator('.peb-settings__name').innerText()).trim();
         // An entry with sub-pages also holds its arrow icon's name: matched by inclusion.
