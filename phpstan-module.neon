@@ -18,8 +18,8 @@ parameters:
         # inside the PrestaShop 9.0 image loads it and checks these calls.
         -
             message: '#unknown class PrestaShop\\PrestaShop\\Core\\Context\\LegacyControllerContext#'
-        # PHPStan 1, which that action runs, reads the native mixed type of
-        # Symfony 6's JsonResponse as a class of the HttpFoundation namespace.
+        # The analysis reads the code as PHP 7.4, the oldest a PrestaShop 8 shop
+        # runs, where mixed is no native type: against PrestaShop 9, Symfony 6's
+        # mixed parameters (JsonResponse, InputBag) read as a class of their namespace.
         -
             message: '#expects Symfony\\Component\\HttpFoundation\\mixed\|null#'
-            path: src/Controller/AdminPsEditionBasicCacheController.php
