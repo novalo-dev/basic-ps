@@ -32,8 +32,10 @@ trait UseActionAdminLoginControllerSetMedia
      */
     public function hookActionAdminLoginControllerSetMedia(array $params): void
     {
+        // Only the PrestaShop 8 login controller fires this hook; its class is gone
+        // from PrestaShop 9, so the check is on the parent both versions have.
         $controller = $params['controller'] ?? null;
-        if (!$this->isPrestaShop8() || !$controller instanceof \AdminLoginController) {
+        if (!$this->isPrestaShop8() || !$controller instanceof \AdminController) {
             return;
         }
 
