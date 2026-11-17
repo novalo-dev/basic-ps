@@ -141,12 +141,13 @@ class ps_edition_basic extends Module
 
     private function addAdminThemeMedia(): void
     {
-        if (!$this->isPrestaShop8()) {
+        $controller = $this->context->controller;
+        if (!$this->isPrestaShop8() || !$controller instanceof \AdminController) {
             return;
         }
 
-        $this->context->controller->addJS($this->getAssetUrl('views/js/favicon.js'));
-        $this->context->controller->addJS($this->getAssetUrl('views/js/ps9-fixes.js'));
+        $controller->addJS($this->getAssetUrl('views/js/favicon.js'));
+        $controller->addJS($this->getAssetUrl('views/js/ps9-fixes.js'));
     }
 
     /**

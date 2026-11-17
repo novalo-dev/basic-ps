@@ -12,3 +12,14 @@ parameters:
         - vendor
         - dev
     reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        # PrestaShop's PHPStan action on 9.0 does not load this PrestaShop 9 class,
+        # the type of Context::$controller on Symfony pages. The job that analyses
+        # inside the PrestaShop 9.0 image loads it and checks these calls.
+        -
+            message: '#unknown class PrestaShop\\PrestaShop\\Core\\Context\\LegacyControllerContext#'
+        # PHPStan 1, which that action runs, reads the native mixed type of
+        # Symfony 6's JsonResponse as a class of the HttpFoundation namespace.
+        -
+            message: '#expects Symfony\\Component\\HttpFoundation\\mixed\|null#'
+            path: src/Controller/AdminPsEditionBasicCacheController.php

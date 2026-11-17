@@ -1,0 +1,10 @@
+# The default rules, minus one match: the analytics library bundled in the
+# settings page script names its anonymous-id cookie "ajs_anonymous_id" in a
+# variable called anonKey, which the generic key rule reads as a secret.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Cookie name of the bundled analytics library"
+regexTarget = "line"
+regexes = ['''anonKey="ajs_anonymous_id"''']

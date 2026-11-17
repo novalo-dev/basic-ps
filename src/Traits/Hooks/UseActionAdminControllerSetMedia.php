@@ -48,11 +48,13 @@ trait UseActionAdminControllerSetMedia
         }
 
         // The controller has registered its theme stylesheets by now, iframes included:
-        // they are swapped for the PS 9 build in place, keeping their order.
+        // they are swapped for the PS 9 build in place, keeping their order. On
+        // PrestaShop 8 this hook only ever comes from AdminController::setMedia().
         $controller = $this->context->controller;
-        if (isset($controller->css_files) && is_array($controller->css_files)) {
-            $controller->css_files = (new \PrestaShop\Module\PsEditionBasic\Theme\Ps9Theme($this))->swapCssFiles($controller->css_files);
+        if (!$controller instanceof \AdminController) {
+            return;
         }
+        $controller->css_files = (new \PrestaShop\Module\PsEditionBasic\Theme\Ps9Theme($this))->swapCssFiles($controller->css_files);
         $controller->addCSS($this->getAssetUrl('views/css/fixes.css'));
     }
 
