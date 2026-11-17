@@ -153,16 +153,8 @@
 /*
  * A roomier menu: taller rows a little apart, the icon further from its label,
  * a section's pages lined up under its label, more space around the dividers.
- * The menu is also wider, so that a long module name such as "O'So Flux Pour
- * Octopia" holds on one line; the page content follows the same variable.
+ * The menu keeps PrestaShop's own width.
  */
-:root {
-  --cdk-sidebar-width: 17rem;
-}
-
-body:not(.mobile) .nav-bar:not(.collapsed) {
-  width: var(--cdk-sidebar-width);
-}
 
 #peb-side-bar .px-2.pt-4 {
   padding: .75rem .625rem 0 !important;
