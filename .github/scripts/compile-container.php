@@ -39,6 +39,11 @@ if (!class_exists('Module', false)) {
 if (!class_exists('ps_edition_basic', false)) {
     eval('class ps_edition_basic extends Module {}');
 }
+// The parent of the module controllers, which are services so that PrestaShop 9
+// hands them its container; autowiring reads it, so it has to exist.
+if (!class_exists('PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController')) {
+    eval('namespace PrestaShopBundle\Controller\Admin; abstract class FrameworkBundleAdminController {}');
+}
 
 $symfony = class_exists(Composer\InstalledVersions::class)
     ? (string) Composer\InstalledVersions::getPrettyVersion('symfony/dependency-injection')
