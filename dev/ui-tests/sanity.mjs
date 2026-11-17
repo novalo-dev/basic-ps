@@ -259,6 +259,17 @@ const lookChecks = async () => {
         // Scroll bars the page should not have: sideways on the whole page, or on a
         // block whose content does not fit, other than the ones made to scroll.
         const sideways = Math.round(document.documentElement.scrollWidth - innerWidth);
+        let widest = '';
+        if (sideways > 1) {
+            let right = 0;
+            for (const element of document.querySelectorAll('body *')) {
+                const box = element.getBoundingClientRect();
+                if (box.width > 0 && box.right > right && getComputedStyle(element).position !== 'fixed') {
+                    right = box.right;
+                    widest = `${element.tagName.toLowerCase()}${element.id ? '#' + element.id : ''}.${[...element.classList].slice(0, 3).join('.')} up to ${Math.round(box.right)}px`;
+                }
+            }
+        }
         const scrollBars = [...document.querySelectorAll('#main *')]
             .filter((element) => {
                 if (!shown(element) || element.closest('.nav-bar, .modal, .dropdown-menu, .table-responsive, textarea, select, pre, code, .select2-results, .CodeMirror, .tree-panel-heading-controls')) {
@@ -309,12 +320,12 @@ const lookChecks = async () => {
                 invisible.push(`"${text.textContent.trim().slice(0, 30)}"`);
             }
         }
-        return { sheets, notice: notice ? getComputedStyle(notice).display : 'none', wordIcons, gap, gapBlock, covered, invisible, grey, underMenu, sideways, scrollBars };
+        return { sheets, notice: notice ? getComputedStyle(notice).display : 'none', wordIcons, gap, gapBlock, covered, invisible, grey, underMenu, sideways, widest, scrollBars };
     });
     const clashes = [
         ...state.covered.map((what) => `under the header: ${what}`),
         ...state.underMenu.map((what) => `under the menu: ${what}`),
-        ...(state.sideways > 1 ? [`the page scrolls sideways by ${state.sideways}px`] : []),
+        ...(state.sideways > 1 ? [`the page scrolls sideways by ${state.sideways}px (${state.widest})`] : []),
         ...state.scrollBars.map((what) => `a scroll bar on ${what}`),
         ...state.invisible.map((what) => `text the colour of its background: ${what}`),
     ];
