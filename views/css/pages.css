@@ -237,8 +237,13 @@
   display: none !important;
 }
 
+/* The circle holds the glyph, so the glyph keeps the width of one icon. */
 .peb-settings__icon {
+  display: inline-flex;
   flex: 0 0 auto;
+}
+
+.peb-settings__icon .material-icons {
   font-size: 28px;
   line-height: 1;
 }
