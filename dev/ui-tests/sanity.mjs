@@ -528,7 +528,8 @@ if (signedIn) {
                         const fit = await page.evaluate(() => {
                             const app = document.querySelector('#content.nobootstrap > #app');
                             const box = app && app.querySelector('.ps-checkout-backoffice-sdk');
-                            return box ? {
+                            // Hidden while Checkout asks for the modules it needs.
+                            return box && getComputedStyle(app).display !== 'none' ? {
                                 bottom: Math.round(box.getBoundingClientRect().bottom),
                                 height: Math.round(box.getBoundingClientRect().height),
                                 window: window.innerHeight,

@@ -82,8 +82,10 @@ body:not(.display-modal) #content.nobootstrap {
  * page itself scrolled too, so short windows showed two scroll bars. The frame's
  * box now fills what is left of the window below the page header, whatever its
  * height, and the page no longer scrolls: only Checkout's own content does.
+ * Not while Checkout hides its app to ask for the modules it needs first: that
+ * screen is a page of normal height.
  */
-body:not(.display-modal) #content.nobootstrap:has(> #app > .ps-checkout-backoffice-sdk) {
+body:not(.display-modal) #content.nobootstrap:has(> #app:not([style*="display:none"]) > .ps-checkout-backoffice-sdk) {
   display: flex;
   flex-direction: column;
   height: calc(100vh - var(--cdk-header-height));
