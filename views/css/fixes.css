@@ -209,3 +209,13 @@ body:not(.display-modal) #content:is(.bootstrap, .nobootstrap) > .bootstrap:has(
 .nav-bar-overflow > .ps__rail-x {
   display: none !important;
 }
+
+/*
+ * Wide data tables of legacy pages (the catalog evaluation of the statistics, 17
+ * columns) only just fit beside the menu with PrestaShop 9's font, and Firefox
+ * made the whole page scroll sideways for their headers. A header may break
+ * inside a word when nothing else fits, rather than push the page.
+ */
+#content.bootstrap .table th {
+  overflow-wrap: anywhere;
+}
