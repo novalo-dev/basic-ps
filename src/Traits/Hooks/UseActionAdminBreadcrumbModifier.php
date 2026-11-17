@@ -33,7 +33,9 @@ trait UseActionAdminBreadcrumbModifier
      */
     public function hookActionAdminBreadcrumbModifier(array &$params)
     {
-        if (!\Configuration::get('SMB_IS_NEW_MENU_ENABLED')) {
+        // On PrestaShop 9 the module brings only the menu and the settings page: the
+        // breadcrumb stays PrestaShop's own, whose entries are MenuLink objects there.
+        if (!\Configuration::get('SMB_IS_NEW_MENU_ENABLED') || !$this->isPrestaShop8()) {
             return;
         }
 

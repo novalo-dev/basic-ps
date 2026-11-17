@@ -32,10 +32,23 @@ trait UseDisplayAdminNavBarBeforeEnd
         }
 
         // PrestaShop 8.0 never calls actionAdminMenuTabsModifier, so the simplified
-        // menu is built here from the tabs the back office has already assigned.
-        if (!is_array($this->context->smarty->getTemplateVars('tabs_simplify'))) {
-            $tabs = $this->context->smarty->getTemplateVars('tabs');
-            $this->context->smarty->assign('tabs_simplify', is_array($tabs) ? $this->simplifyTabs($tabs) : []);
+        // menu is built here from the tabs the back office has already assigned. The
+        // PrestaShop 9 Twig layout assigns none, so the menu is read from the database.
+        $smarty = $this->context->smarty;
+        if (!is_array($smarty->getTemplateVars('tabs_simplify'))) {
+            $tabs = $smarty->getTemplateVars('tabs');
+            if (!is_array($tabs)) {
+                $tabs = \PrestaShop\Module\PsEditionBasic\Helper\MenuTabs::fromDatabase($this->context);
+            }
+            $smarty->assign('tabs_simplify', $this->simplifyTabs($tabs));
+        }
+
+        // Assigned by the PrestaShop 8 header only; PrestaShop 9 keeps the same cookie.
+        if ($smarty->getTemplateVars('collapse_menu') === null) {
+            $smarty->assign('collapse_menu', (int) ($this->context->cookie->collapse_menu ?? 0));
+        }
+        if ($smarty->getTemplateVars('toggle_navigation_url') === null) {
+            $smarty->assign('toggle_navigation_url', $this->context->link->getAdminLink('AdminEmployees', true, [], ['action' => 'toggleMenu']));
         }
 
         return $this->display($this->_path, 'views/templates/admin/side-bar.tpl');

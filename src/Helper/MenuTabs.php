@@ -29,6 +29,69 @@ namespace PrestaShop\Module\PsEditionBasic\Helper;
 class MenuTabs
 {
     /**
+     * The back office menu as AdminController::getTabs() builds it on PrestaShop 8.
+     * PrestaShop 9 builds its menu in a Twig component instead: its Symfony pages
+     * have no getTabs() and assign no menu to Smarty, so the module reads it here,
+     * with the same rules (access rights, enabled tabs, links, current page).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function fromDatabase(\Context $context, int $parentId = 0, int $level = 0): array
+    {
+        $currentId = (int) \Tab::getCurrentParentId();
+        $controllerName = (string) \Tools::getValue('controller');
+        $result = [];
+
+        foreach (\Tab::getTabs((int) $context->language->id, $parentId) as $tab) {
+            if (!\Tab::checkTabRights((int) $tab['id_tab'])
+                || !$tab['enabled']
+                || $tab['class_name'] === 'AdminCarrierWizard') {
+                continue;
+            }
+
+            $tab['current'] = $currentId === (int) $tab['id_tab'] || ($controllerName !== '' && $tab['class_name'] === $controllerName);
+            if ($tab['current']) {
+                $tab['current_level'] = $level;
+            }
+            $tab['img'] = null;
+            try {
+                $tab['href'] = $context->link->getTabLink($tab);
+            } catch (\Exception $e) {
+                // A module tab whose route is gone: PrestaShop shows it without a link too.
+                $tab['href'] = '';
+            }
+            $tab['sub_tabs'] = self::fromDatabase($context, (int) $tab['id_tab'], $level + 1);
+
+            $subTabHref = '';
+            foreach ($tab['sub_tabs'] as $subTab) {
+                if ($subTab['active'] && $subTab['enabled']) {
+                    $subTabHref = $subTab['href'];
+                    break;
+                }
+            }
+            if ($subTabHref !== '') {
+                $tab['href'] = $subTabHref;
+            } elseif ((int) $tab['id_parent'] === 0 && empty($tab['icon'])) {
+                continue;
+            } elseif (empty($tab['icon'])) {
+                $tab['icon'] = 'extension';
+            }
+
+            foreach ($tab['sub_tabs'] as $subTab) {
+                if ($subTab['current']) {
+                    $tab['current'] = true;
+                    $tab['current_level'] = $subTab['current_level'];
+                    break;
+                }
+            }
+
+            $result[] = $tab;
+        }
+
+        return $result;
+    }
+
+    /**
      * The entries that modules add to the back office menu, as opposed to the core
      * sections the simplified menu and the settings page already list.
      *

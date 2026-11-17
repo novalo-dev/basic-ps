@@ -104,10 +104,7 @@ class AdminPsEditionBasicController extends FrameworkBundleAdminController
 
         $jsLink = $modulePsEditionBasic->getAssetUrl((string) $modulePsEditionBasic->getParameter('ps_edition_basic.edition_basic_homepage_js'));
 
-        $reflection = new \ReflectionClass($this->getContext()->controller);
-        $method = $reflection->getMethod('getTabs');
-        $method->setAccessible(true);
-        $tabs = $method->invoke($this->getContext()->controller);
+        $tabs = \PrestaShop\Module\PsEditionBasic\Helper\MenuTabs::fromDatabase($this->getContext());
 
         /**
          * @var string|string[]
