@@ -523,6 +523,26 @@ if (signedIn) {
                         await view('8-checkout-short');
                         console.log(`CHECKOUT ${await page.evaluate(scrollingBoxes)}`);
                         console.log(`CHECKOUT frames ${page.frames().map((frame) => frame.url().slice(0, 100)).join(' | ')}`);
+                        // Checkout's frame scrolls its own content: it has to reach
+                        // the bottom of the window, with no page scroll around it.
+                        const fit = await page.evaluate(() => {
+                            const app = document.querySelector('#content.nobootstrap > #app');
+                            const box = app && app.querySelector('.ps-checkout-backoffice-sdk');
+                            return box ? {
+                                bottom: Math.round(box.getBoundingClientRect().bottom),
+                                height: Math.round(box.getBoundingClientRect().height),
+                                window: window.innerHeight,
+                                page: document.documentElement.scrollHeight,
+                            } : null;
+                        });
+                        if (fit) {
+                            if (Math.abs(fit.bottom - fit.window) > 2 || fit.height < 100) {
+                                throw new Error(`Checkout's frame ends at ${fit.bottom}px, ${fit.height}px high, in a ${fit.window}px window`);
+                            }
+                            if (fit.page > fit.window + 1) {
+                                throw new Error(`the page scrolls around Checkout's frame: ${fit.page}px in a ${fit.window}px window`);
+                            }
+                        }
                         await lookChecks();
                     } finally {
                         await page.setViewportSize({ width: 1400, height: 900 });
