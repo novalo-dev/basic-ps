@@ -45,7 +45,6 @@ class AdminPsEditionBasicSettingsController extends AdminPsEditionBasicControlle
     protected function pageVariables(): array
     {
         $tabs = MenuTabs::fromDatabase($this->legacyContext());
-        $cards = self::arrange($this->settingsCards($tabs));
 
         return [
             'texts' => [
@@ -59,7 +58,7 @@ class AdminPsEditionBasicSettingsController extends AdminPsEditionBasicControlle
                 'yes' => $this->getService('translator')->trans('Yes', [], 'Admin.Global'),
                 'no' => $this->getService('translator')->trans('No', [], 'Admin.Global'),
             ],
-            'cards' => $cards,
+            'cards' => $this->settingsCards($tabs),
             'menuModules' => $this->menuModuleCards($tabs),
             'menuModulesUrl' => $this->getService('router')->generate('ps_edition_basic_menu_module'),
         ];
@@ -107,58 +106,12 @@ class AdminPsEditionBasicSettingsController extends AdminPsEditionBasicControlle
             ];
         }
 
-        // The two sections with the most pages span two columns each; arrange()
-        // places them so that every row is full.
-        $counts = array_map(static function (array $card): int {
-            return count($card['links']);
-        }, $cards);
-        arsort($counts);
-        $wide = array_slice(array_keys($counts), 0, 2);
+        // Two sections span two columns, in the list's own order: the second card,
+        // at the right of the first row, and the one before last, at the left of
+        // the last row. With the seven sections of a shop, every row is full.
+        $count = count($cards);
         foreach ($cards as $index => $card) {
-            $cards[$index]['wide'] = in_array($index, $wide, true);
-        }
-
-        return $cards;
-    }
-
-    /**
-     * The place of each card in the three-column grid, so that each wide card
-     * shares its row with a narrow one instead of leaving a hole beside it.
-     *
-     * Full rows of narrow cards come first, then a row per wide card with one
-     * narrow card, alternately after and before it, then what is left. Both
-     * kinds keep their order.
-     *
-     * @param array<int, array<string, mixed>> $cards
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    private static function arrange(array $cards): array
-    {
-        $narrow = [];
-        $wide = [];
-        foreach ($cards as $index => $card) {
-            if ($card['wide']) {
-                $wide[] = $index;
-            } else {
-                $narrow[] = $index;
-            }
-        }
-        $fullRows = intdiv(max(0, count($narrow) - count($wide)), 3);
-        $sequence = array_splice($narrow, 0, $fullRows * 3);
-        foreach ($wide as $i => $index) {
-            $partner = array_shift($narrow);
-            $row = $i % 2 === 0 ? [$partner, $index] : [$index, $partner];
-            foreach ($row as $item) {
-                if ($item !== null) {
-                    $sequence[] = $item;
-                }
-            }
-        }
-        $sequence = array_merge($sequence, $narrow);
-
-        foreach ($sequence as $order => $item) {
-            $cards[$item]['order'] = $order;
+            $cards[$index]['wide'] = $count >= 4 && ($index === 1 || $index === $count - 2);
         }
 
         return $cards;

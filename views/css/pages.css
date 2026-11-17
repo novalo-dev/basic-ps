@@ -237,8 +237,8 @@
   display: none !important;
 }
 
-/* On a wide screen the sections are a three-column grid; the server gives each
-   card its place (order) so the two wide ones each share a row with a narrow one. */
+/* On a wide screen the sections are a three-column grid, two of its cards over
+   two columns. */
 @media (min-width: 992px) {
   .peb-settings .peb-settings__grid {
     display: grid;
