@@ -51,7 +51,7 @@ class AdminPsEditionBasicSettingsController extends AdminPsEditionBasicControlle
                 'title' => $this->translate('Configuration'),
                 'description' => $this->translate('Configure your shop in a few clicks'),
                 'modulesTitle' => $this->translate('Modules'),
-                'modulesDescription' => $this->translate('Choose the module pages shown in the menu.'),
+                'modulesDescription' => $this->translate('Configure your modules in a few clicks'),
                 'switch' => $this->translate('Show in the menu'),
                 'switchHelp' => $this->translate('Adds the pages of this module to the menu on the left. Its own pages stay reachable here either way.'),
                 'error' => $this->translate('The change could not be saved. Reload the page and try again.'),

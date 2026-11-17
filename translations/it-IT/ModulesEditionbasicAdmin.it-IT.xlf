@@ -22,11 +22,6 @@
         <target state="translated">Moduli</target>
         <note>Line: </note>
       </trans-unit>
-      <trans-unit id="6ed87c3e5573bcbf7ea8026c07273b44">
-        <source>Choose the module pages shown in the menu.</source>
-        <target state="translated">Scegli le pagine dei moduli mostrate nel menu.</target>
-        <note>Line: </note>
-      </trans-unit>
       <trans-unit id="691323e4f2d181a71c65f9f058f89824">
         <source>Show in the menu</source>
         <target state="translated">Mostra nel menu</target>
@@ -215,6 +210,11 @@
       <trans-unit id="dfe6d43c09a98e8202ddbe00943f2a59">
         <source>Adds the pages of this module to the menu on the left. Its own pages stay reachable here either way.</source>
         <target state="translated">Aggiunge le pagine di questo modulo al menu a sinistra. Restano comunque raggiungibili da qui.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="7c1f131b93fbf6ad41b95978db5504c9">
+        <source>Configure your modules in a few clicks</source>
+        <target state="translated">Configura i tuoi moduli con pochi clic</target>
         <note>Line: </note>
       </trans-unit>
     </body>
