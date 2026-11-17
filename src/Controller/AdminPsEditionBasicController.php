@@ -66,6 +66,15 @@ class AdminPsEditionBasicController extends FrameworkBundleAdminController
         return $this->translate('Home');
     }
 
+    /**
+     * Whether the page lists the module pages with their menu switch: the
+     * settings page does, the help center does not.
+     */
+    protected function showsMenuModules(): bool
+    {
+        return false;
+    }
+
     public function filter_settings_tabs_recursive(array $tabs, array $whitelist, array $blacklist = []): array
     {
         $filtered = [];
@@ -198,7 +207,7 @@ class AdminPsEditionBasicController extends FrameworkBundleAdminController
             'layoutTitle' => $this->layoutTitle(),
             'enableSidebar' => true,
             'jsLink' => $jsLink,
-            'menuModules' => $this->menuModuleCards($tabs),
+            'menuModules' => $this->showsMenuModules() ? $this->menuModuleCards($tabs) : [],
             'menuModulesTexts' => [
                 'title' => $this->translate('Modules'),
                 'description' => $this->translate('Choose the module pages shown in the menu.'),

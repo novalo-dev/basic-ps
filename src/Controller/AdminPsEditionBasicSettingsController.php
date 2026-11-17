@@ -29,4 +29,9 @@ class AdminPsEditionBasicSettingsController extends AdminPsEditionBasicControlle
     {
         return $this->translate('Settings');
     }
+
+    protected function showsMenuModules(): bool
+    {
+        return true;
+    }
 }

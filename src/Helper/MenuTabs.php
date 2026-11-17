@@ -136,7 +136,7 @@ class MenuTabs
     {
         return !in_array($tab['class_name'], $coreClassNames, true)
             && (int) ($tab['active'] ?? 1) !== 0
-            && $tab['class_name'] !== 'AdminPsEditionBasicSettingsController';
+            && ($tab['module'] ?? '') !== 'ps_edition_basic';
     }
 
     /**

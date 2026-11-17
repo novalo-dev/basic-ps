@@ -198,6 +198,7 @@ if (signedIn) {
     });
 
     let settingsUrl = '';
+    let helpUrl = '';
     await check('the simplified menu', async () => {
         await page.waitForFunction(() => {
             const bar = document.querySelector('wc-side-bar');
@@ -206,7 +207,7 @@ if (signedIn) {
         const entries = await page.evaluate(() => [...document.querySelector('wc-side-bar').shadowRoot.querySelectorAll('a')]
             .map((anchor) => ({ text: anchor.textContent.replace(/\s+/g, ' ').trim(), href: anchor.href })));
         const has = (word) => entries.some((entry) => entry.text.includes(word));
-        for (const word of ['Dashboard', 'Orders', 'Catalog', 'Settings']) {
+        for (const word of ['Dashboard', 'Help Center', 'Orders', 'Catalog', 'Settings']) {
             if (!has(word)) {
                 throw new Error(`no ${word} entry`);
             }
@@ -214,6 +215,15 @@ if (signedIn) {
         if (entries.some((entry) => /\bModule Manager\b|\bTheme & Logo\b/.test(entry.text))) {
             throw new Error('Modules or Design are still in the menu');
         }
+        // The Help Center sits right under the dashboard, in place of PrestaShop's Care Center.
+        const labels = entries.map((entry) => entry.text);
+        if (labels.findIndex((text) => text.includes('Help Center')) !== labels.findIndex((text) => text.includes('Dashboard')) + 1) {
+            throw new Error(`the Help Center is not right under the dashboard: ${labels.slice(0, 4).join(', ')}`);
+        }
+        if (labels.some((text) => text.includes('Care Center'))) {
+            throw new Error("PrestaShop's Care Center is still in the menu");
+        }
+        helpUrl = (entries.find((entry) => entry.text.includes('Help Center')) || {}).href || '';
         settingsUrl = (entries.find((entry) => /Settings$/.test(entry.text)) || {}).href || '';
         if (!settingsUrl) {
             throw new Error('the Settings entry has no link');
@@ -236,6 +246,19 @@ if (signedIn) {
         }
         await view('4-settings-page');
         await lookChecks();
+    });
+
+    // The help blocks of PrestaShop's original homepage, links only.
+    await check('the help center', async () => {
+        await open(helpUrl);
+        await page.waitForFunction(() => document.querySelectorAll('#vue-app a[href*="care-center.prestashop.com"]').length >= 5, null, { timeout: 30000 });
+        const outside = await page.evaluate(() => [...document.querySelectorAll('#vue-app a[href^="http"]')]
+            .map((anchor) => new URL(anchor.href).hostname)
+            .filter((host) => host !== location.hostname && !/(^|\.)prestashop\.com$/.test(host)));
+        if (outside.length > 0) {
+            throw new Error(`links outside PrestaShop: ${[...new Set(outside)].join(', ')}`);
+        }
+        await view('6-help-center');
     });
 
     // Module pages are off the menu until switched on from their settings card.
@@ -322,6 +345,19 @@ if (signedIn && browserName === 'chromium') {
                 throw new Error(`${overflow} settings card(s) wider than the screen`);
             }
             await view(`${device}-2-settings`, small);
+
+            const help = await small.evaluate(() => [...document.querySelector('wc-side-bar').shadowRoot.querySelectorAll('a')]
+                .map((anchor) => anchor.href).find((href) => /pseditionbasic\/help/.test(href)));
+            if (!help) {
+                throw new Error('no Help Center entry in the menu');
+            }
+            await small.goto(help, { waitUntil: 'load' });
+            await small.waitForFunction(() => document.querySelectorAll('#vue-app a[href*="care-center.prestashop.com"]').length >= 5, null, { timeout: 30000 });
+            const tooWide = await small.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+            if (tooWide > 1) {
+                throw new Error(`the help center scrolls sideways by ${tooWide}px`);
+            }
+            await view(`${device}-3-help-center`, small);
         });
         await context.close();
     }

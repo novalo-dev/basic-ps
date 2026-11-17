@@ -59,14 +59,25 @@ class Lists
     }
 
     /**
-     * Every page the menu or the settings page already places: what is left are
-     * the module pages the merchant chooses to show in the menu or not.
+     * Pages the simplified menu leaves out because the module's own page takes
+     * their place: PrestaShop's Care Center gives way to the Help Center.
+     *
+     * @return string[]
+     */
+    public static function menuHidden(): array
+    {
+        return self::load('menuHiddenList.json');
+    }
+
+    /**
+     * Every page the menu or the settings page already places or leaves out: what
+     * is left are the module pages the merchant chooses to show in the menu or not.
      *
      * @return string[]
      */
     public static function placed(): array
     {
-        return array_merge(self::settings(), self::menu(), self::menuBottom());
+        return array_merge(self::settings(), self::menu(), self::menuBottom(), self::menuHidden());
     }
 
     /**

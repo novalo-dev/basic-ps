@@ -14,7 +14,9 @@
 
 With the simplified menu on:
 
-- the menu keeps the dashboard, *Care Center* just under it, and the selling sections;
+- the menu keeps the dashboard, a *Help Center* just under it, and the selling sections;
+  the Help Center gathers the links to PrestaShop's documentation and support offers,
+  and takes the place of PrestaShop's *Care Center*, which needs a PrestaShop account;
 - module pages are listed as cards on the settings page, each with a switch: a page
   switched on joins the menu, grouped above *Settings* between two separators (all
   are off at first);

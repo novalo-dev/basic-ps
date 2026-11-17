@@ -177,6 +177,11 @@
         <target state="translated">No se pudo guardar el cambio. Recarga la página e inténtalo de nuevo.</target>
         <note>Line: </note>
       </trans-unit>
+      <trans-unit id="efdaf9f44ce968366fa78277263abc1d">
+        <source>Help Center</source>
+        <target state="translated">Centro de ayuda</target>
+        <note>Line: </note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

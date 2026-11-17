@@ -77,7 +77,7 @@ class Uninstall
 
     public function uninstallTabs(): bool
     {
-        return $this->removeTabs(['HOME', 'AdminPsEditionBasicHomepageController', 'AdminPsEditionBasicSettingsController']);
+        return $this->removeTabs(['HOME', 'AdminPsEditionBasicHomepageController', 'AdminPsEditionBasicSettingsController', 'AdminPsEditionBasicHelpController']);
     }
 
     /**

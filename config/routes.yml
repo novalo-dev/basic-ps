@@ -23,3 +23,11 @@ ps_edition_basic_menu_module:
     _controller: PrestaShop\Module\PsEditionBasic\Controller\AdminPsEditionBasicSettingsController::toggleMenuModuleAction
     # Same access as the settings page; no legacy link, which the page already owns.
     _legacy_controller: "CONFIGURE"
+
+ps_edition_basic_help:
+  path: pseditionbasic/help
+  methods: [GET]
+  defaults:
+    _controller: PrestaShop\Module\PsEditionBasic\Controller\AdminPsEditionBasicHelpController::indexAction
+    _legacy_controller: "AdminPsEditionBasicHelpController"
+    _legacy_link: "AdminPsEditionBasicHelpController"

@@ -53,7 +53,8 @@ class TabsInstaller
             $tab->class_name = $tabItem['class_name'];
             $tab->route_name = $tabItem['route_name'];
             $tab->icon = $tabItem['icon'];
-            $tab->active = $tabItem['class_name'] === 'AdminPsEditionBasicSettingsController'
+            // The module's own pages belong to the simplified menu: hidden with it.
+            $tab->active = !empty($tabItem['follows_menu'])
                 ? (bool) \Configuration::get('SMB_IS_NEW_MENU_ENABLED')
                 : $tabItem['active'];
             $tab->enabled = $tabItem['enabled'];

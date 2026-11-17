@@ -177,6 +177,11 @@
         <target state="translated">Impossibile salvare la modifica. Ricarica la pagina e riprova.</target>
         <note>Line: </note>
       </trans-unit>
+      <trans-unit id="efdaf9f44ce968366fa78277263abc1d">
+        <source>Help Center</source>
+        <target state="translated">Centro assistenza</target>
+        <note>Line: </note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

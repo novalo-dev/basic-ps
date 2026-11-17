@@ -48,6 +48,25 @@ class Tabs
                 'enabled' => true,
                 'wording' => '',
                 'wording_domain' => 'Modules.Editionbasic.Admin',
+                'follows_menu' => true,
+            ],
+            [
+                'class_name' => 'AdminPsEditionBasicHelpController',
+                'route_name' => 'ps_edition_basic_help',
+                'name' => [
+                    'en' => 'Help Center',
+                    'fr' => 'Centre d\'aide',
+                    'it' => 'Centro assistenza',
+                    'es' => 'Centro de ayuda',
+                ],
+                'icon' => 'support_agent',
+                'parent' => 'CONFIGURE',
+                'position' => 1,
+                'active' => true,
+                'enabled' => true,
+                'wording' => '',
+                'wording_domain' => 'Modules.Editionbasic.Admin',
+                'follows_menu' => true,
             ],
         ];
     }

@@ -123,12 +123,14 @@ trait HaveConfigurationPage
             $configValue = (bool) \Tools::getValue('SMB_IS_NEW_MENU_ENABLED');
             \Configuration::updateValue('SMB_IS_NEW_MENU_ENABLED', $configValue);
 
-            // The settings page belongs to the simplified menu: without it, the
-            // native menu already lists the same sections.
-            $settingsTab = \Tab::getInstanceFromClassName('AdminPsEditionBasicSettingsController');
-            if ($settingsTab->id) {
-                $settingsTab->active = $configValue;
-                $settingsTab->save();
+            // The module's own pages (settings, help center) belong to the
+            // simplified menu: without it, the native menu lists the same sections.
+            foreach (\PrestaShop\Module\PsEditionBasic\Install\Tabs\Tabs::getTabs() as $tabItem) {
+                $tab = empty($tabItem['follows_menu']) ? null : \Tab::getInstanceFromClassName($tabItem['class_name']);
+                if ($tab && $tab->id) {
+                    $tab->active = $configValue;
+                    $tab->save();
+                }
             }
 
             $output = $this->displayConfirmation($this->trans('Settings updated', [], 'Modules.Editionbasic.Admin'));

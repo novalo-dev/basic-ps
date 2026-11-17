@@ -177,6 +177,11 @@
         <target state="translated">La modification n'a pas pu être enregistrée. Rechargez la page et réessayez.</target>
         <note>Line: </note>
       </trans-unit>
+      <trans-unit id="efdaf9f44ce968366fa78277263abc1d">
+        <source>Help Center</source>
+        <target state="translated">Centre d'aide</target>
+        <note>Line: </note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

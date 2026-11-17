@@ -17,6 +17,13 @@ services:
     public: true
     tags: ['controller.service_arguments']
 
+  PrestaShop\Module\PsEditionBasic\Controller\AdminPsEditionBasicHelpController:
+    class: PrestaShop\Module\PsEditionBasic\Controller\AdminPsEditionBasicHelpController
+    autowire: true
+    autoconfigure: true
+    public: true
+    tags: ['controller.service_arguments']
+
   PrestaShop\Module\PsEditionBasic\Controller\AdminPsEditionBasicCacheController:
     class: PrestaShop\Module\PsEditionBasic\Controller\AdminPsEditionBasicCacheController
     autowire: true

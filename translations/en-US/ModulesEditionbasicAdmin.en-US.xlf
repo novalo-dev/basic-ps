@@ -177,6 +177,11 @@
         <target state="translated">The change could not be saved. Reload the page and try again.</target>
         <note>Line: </note>
       </trans-unit>
+      <trans-unit id="efdaf9f44ce968366fa78277263abc1d">
+        <source>Help Center</source>
+        <target state="translated">Help Center</target>
+        <note>Line: </note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
