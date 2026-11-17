@@ -111,8 +111,69 @@ const lookChecks = async () => {
                 gap = Math.round(Math.min(...blocks) - bottom);
             }
         }
-        return { sheets, notice: notice ? getComputedStyle(notice).display : 'none', wordIcons, gap };
+        // Whatever the page, nothing readable may sit under the fixed header, and no
+        // text may be drawn in the colour of what is behind it: pages of other
+        // modules are built for the PrestaShop 8 look and can clash with the 9 one.
+        const shown = (element) => {
+            const box = element.getBoundingClientRect();
+            const style = getComputedStyle(element);
+            return box.width > 0 && box.height > 0 && style.visibility !== 'hidden' && parseFloat(style.opacity) > 0.05;
+        };
+        const header = [...document.querySelectorAll('.header-toolbar, .page-head, .main-header, #header')]
+            .filter((element) => shown(element) && getComputedStyle(element).position === 'fixed');
+        const headerBottom = Math.max(0, ...header.map((element) => element.getBoundingClientRect().bottom));
+        const covered = [];
+        for (const element of document.querySelectorAll('#main-div a, #main-div button, #main-div h1, #main-div h2, #main-div h3, #main-div h4, #main-div label, #main-div p, #main-div input, #content a, #content button, #content h2, #content h3, #content label, #content p, #content input')) {
+            if (covered.length > 4 || !shown(element) || element.closest('.header-toolbar, .page-head, .main-header, #header, .nav-bar, .modal, .dropdown-menu, [role="dialog"]')) {
+                continue;
+            }
+            const box = element.getBoundingClientRect();
+            if (box.top + box.height / 2 < headerBottom - 2 && box.bottom > 0 && (element.textContent.trim() || element.tagName === 'INPUT')) {
+                covered.push(`${element.tagName.toLowerCase()} "${element.textContent.trim().slice(0, 30)}"`);
+            }
+        }
+        const rgb = (value) => (value.match(/[\d.]+/g) || []).map(Number);
+        const luminance = ([r, g, b]) => [r, g, b].map((c) => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; })
+            .reduce((sum, c, i) => sum + c * [0.2126, 0.7152, 0.0722][i], 0);
+        const background = (element) => {
+            for (let node = element; node; node = node.parentElement) {
+                const style = getComputedStyle(node);
+                if (style.backgroundImage !== 'none') {
+                    return null;
+                }
+                const colour = rgb(style.backgroundColor);
+                if (colour.length === 3 || (colour.length === 4 && colour[3] > 0.5)) {
+                    return colour;
+                }
+            }
+            return [255, 255, 255];
+        };
+        const invisible = [];
+        for (const element of document.querySelectorAll('body *')) {
+            if (invisible.length > 4 || !shown(element) || element.closest('.nav-bar, .modal:not(.show), [aria-hidden="true"]')) {
+                continue;
+            }
+            const text = [...element.childNodes].find((node) => node.nodeType === 3 && node.textContent.trim().length > 1);
+            const behind = text ? background(element) : null;
+            const colour = rgb(getComputedStyle(element).color);
+            if (!behind || (colour.length === 4 && colour[3] < 0.3)) {
+                continue;
+            }
+            const [light, dark] = [luminance(colour), luminance(behind)].sort((a, b) => b - a);
+            if ((light + 0.05) / (dark + 0.05) < 1.35) {
+                invisible.push(`"${text.textContent.trim().slice(0, 30)}"`);
+            }
+        }
+        return { sheets, notice: notice ? getComputedStyle(notice).display : 'none', wordIcons, gap, covered, invisible };
     });
+    const clashes = [
+        ...state.covered.map((what) => `under the header: ${what}`),
+        ...state.invisible.map((what) => `text the colour of its background: ${what}`),
+    ];
+    if (clashes.length > 0 && !isPs8) {
+        // PrestaShop 9 draws these pages itself: reported, not held against the module.
+        console.log(`::warning title=Look on PrestaShop 9::${step}: ${clashes.join('; ')}`);
+    }
     const core = state.sheets.filter((href) => /\/themes\/(new-theme|default)\/public\/theme\.css/.test(href));
     const ours = state.sheets.filter((href) => href.includes('/modules/ps_edition_basic/views/ps9/'));
     if (isPs8) {
@@ -130,6 +191,9 @@ const lookChecks = async () => {
         }
         if (state.gap !== null && state.gap < 8) {
             throw new Error(`the first block starts ${state.gap}px under the page header`);
+        }
+        if (clashes.length > 0) {
+            throw new Error(clashes.join('; '));
         }
     } else if (ours.length > 0) {
         throw new Error('the module changes the stylesheets of PrestaShop 9');
@@ -169,6 +233,22 @@ if (signedIn) {
             await open(href);
             await lookChecks();
         });
+    }
+
+    // The configuration page of every installed module: the module's look reaches
+    // pages written by others, which the menu alone does not list.
+    const manager = links.find(([href]) => /improve\/modules\/manage|controller=AdminModulesSf/.test(href));
+    if (manager) {
+        await open(manager[0]).catch(() => {});
+        const configurePages = await page.$$eval('a[href*="/action/configure/"], a[href*="controller=AdminModules"][href*="configure="]', (anchors) => [...new Map(anchors
+            .map((anchor) => [anchor.href, (anchor.href.match(/configure[/=]([a-z0-9_]+)/i) || [])[1] || anchor.href])).entries()]);
+        console.log(`${configurePages.length} module configuration pages`);
+        for (const [href, name] of configurePages.slice(0, 120)) {
+            await check(`module ${name}`, async () => {
+                await open(href);
+                await lookChecks();
+            });
+        }
     }
 
     await check('switch the simplified menu on', async () => {
