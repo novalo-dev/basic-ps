@@ -33,6 +33,12 @@ trait UseDisplayDashboardTop
             return '';
         }
 
+        $breadcrumb = $this->context->smarty->getTemplateVars('breadcrumbs2');
+        if (!is_array($breadcrumb)) {
+            return '';
+        }
+        $this->context->smarty->assign('peb_breadcrumb', \PrestaShop\Module\PsEditionBasic\Helper\SideBar::breadcrumb($breadcrumb));
+
         return $this->display($this->_path, 'views/templates/admin/breadcrumb.tpl');
     }
 }

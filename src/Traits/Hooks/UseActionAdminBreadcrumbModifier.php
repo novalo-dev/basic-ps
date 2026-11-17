@@ -25,7 +25,7 @@ trait UseActionAdminBreadcrumbModifier
 {
     /**
      * Hook actionAdminBreadcrumbModifier.
-     * Modify breadcrumb in BackOffice to add Parametres in children of Configure
+     * Modify breadcrumb in BackOffice to add the settings page above the pages it lists
      *
      * @param array $params
      *
@@ -57,7 +57,7 @@ trait UseActionAdminBreadcrumbModifier
             if (in_array($tab['class_name'], \PrestaShop\Module\PsEditionBasic\Config\Lists::settings())) {
                 array_unshift($breadcrumb, [
                     'href' => $this->context->link->getAdminLink('CONFIGURE'),
-                    'name' => 'Paramètres',
+                    'name' => $this->trans('Settings', [], 'Modules.Editionbasic.Admin'),
                 ]);
             }
         }

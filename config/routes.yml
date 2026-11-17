@@ -6,16 +6,6 @@ ps_edition_basic_settings:
     _legacy_controller: "CONFIGURE"
     _legacy_link: "CONFIGURE"
 
-
-ps_edition_basic_clean_mbo_cache:
-  path: pseditionbasic/cache-clear
-  methods: [PATCH]
-  defaults:
-    _controller: PrestaShop\Module\PsEditionBasic\Controller\AdminPsEditionBasicCacheController::handleRequest
-    _legacy_controller: "AdminPsEditionBasicCacheController"
-    _legacy_link: "AdminPsEditionBasicCacheController"
-
-
 ps_edition_basic_menu_module:
   path: pseditionbasic/menu-module
   methods: [POST]

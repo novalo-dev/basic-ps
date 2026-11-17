@@ -23,16 +23,15 @@ declare(strict_types=1);
 
 namespace PrestaShop\Module\PsEditionBasic\Controller;
 
-use PrestaShop\Module\PsEditionBasic\Config\Lists;
-use PrestaShop\Module\PsEditionBasic\Config\MenuModules;
-use PrestaShop\Module\PsEditionBasic\Helper\MenuTabs;
 use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AdminPsEditionBasicController extends FrameworkBundleAdminController
+/**
+ * The pages of the module, drawn by Twig with the class names of PrestaShop's
+ * design system; their rules ship in views/css/pages.css.
+ */
+abstract class AdminPsEditionBasicController extends FrameworkBundleAdminController
 {
     /**
      * A service from the full Symfony container. Named apart from PrestaShop's own
@@ -61,131 +60,18 @@ class AdminPsEditionBasicController extends FrameworkBundleAdminController
         return $this->getService('translator')->trans($id, [], 'Modules.Editionbasic.Admin');
     }
 
-    protected function layoutTitle(): string
-    {
-        return $this->translate('Home');
-    }
+    abstract protected function layoutTitle(): string;
+
+    abstract protected function template(): string;
 
     /**
-     * Whether the page lists the module pages with their menu switch: the
-     * settings page does, the help center does not.
+     * @return array<string, mixed>
      */
-    protected function showsMenuModules(): bool
+    abstract protected function pageVariables(): array;
+
+    protected function assetUrl(string $path): string
     {
-        return false;
-    }
-
-    public function filter_settings_tabs_recursive(array $tabs, array $whitelist, array $blacklist = []): array
-    {
-        $filtered = [];
-
-        foreach ($tabs as $tab) {
-            if (in_array($tab['class_name'], $whitelist)) {
-                if ($tab['class_name'] === 'AdminAdvancedParameters') {
-                    $tmp = [];
-                    for ($i = 0; $i < count($tab['sub_tabs']); ++$i) {
-                        if (!in_array($tab['sub_tabs'][$i]['wording'], $blacklist)) {
-                            array_push($tmp, $tab['sub_tabs'][$i]);
-                        }
-                    }
-                    $tab['sub_tabs'] = $tmp;
-                }
-                $filtered[] = $tab;
-                continue;
-            }
-
-            $filtered = array_merge($filtered, $this->filter_settings_tabs_recursive($tab['sub_tabs'], $whitelist, $blacklist));
-        }
-
-        return array_values($this->reorganize_tabs($filtered, $whitelist));
-    }
-
-    public function reorganize_tabs(array $tabs, array $whitelist): array
-    {
-        $reorganized = [];
-
-        foreach ($whitelist as $tabClassName) {
-            foreach ($tabs as $item) {
-                if ($item['class_name'] === $tabClassName) {
-                    $reorganized[] = $item;
-                    break;
-                }
-            }
-        }
-
-        return $reorganized;
-    }
-
-    private function buildAdminUrl(string $routeName): string
-    {
-        $router = $this->getService('router');
-        $scheme = isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'https://') === 0 ? 'https://' : 'http://';
-
-        return $scheme . $_SERVER['HTTP_HOST'] . $router->generate($routeName);
-    }
-
-    /**
-     * The module pages of the back office, as cards for the settings page, each
-     * with whether the merchant switched it on in the menu.
-     *
-     * @param array<int, array<string, mixed>> $tabs the whole back office menu
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    private function menuModuleCards(array $tabs): array
-    {
-        $shown = MenuModules::shown();
-        $cards = [];
-        foreach (MenuTabs::moduleEntries($tabs, Lists::placed()) as $tab) {
-            // The module's own description says what the page is for, as the
-            // configuration cards do; its name stands in when it has none.
-            $description = '';
-            $module = empty($tab['module']) ? null : \Module::getInstanceByName((string) $tab['module']);
-            if ($module) {
-                $description = (string) ($module->description ?: $module->displayName);
-            }
-
-            $cards[] = [
-                'class_name' => (string) $tab['class_name'],
-                'name' => (string) ($tab['name'] ?: $tab['class_name']),
-                'href' => (string) $tab['href'],
-                'icon' => (string) ($tab['icon'] ?: 'extension'),
-                'description' => $description,
-                'shown' => in_array($tab['class_name'], $shown, true),
-                // A module page with pages of its own opens on its links, as the
-                // configuration cards do.
-                'links' => array_values(array_map(function (array $page): array {
-                    return ['name' => (string) $page['name'], 'href' => (string) $page['href']];
-                }, array_filter($tab['sub_tabs'] ?? [], function (array $page): bool {
-                    return (int) ($page['active'] ?? 1) !== 0 && !empty($page['href']);
-                }))),
-            ];
-        }
-
-        return $cards;
-    }
-
-    /**
-     * Saves the switch of one module card: the page shows in the menu or not.
-     */
-    public function toggleMenuModuleAction(Request $request): JsonResponse
-    {
-        if ((int) $this->legacyContext()->employee->id_profile !== 1) {
-            return new JsonResponse(['saved' => false], Response::HTTP_FORBIDDEN);
-        }
-
-        $className = (string) $request->request->get('class_name', '');
-        $shown = (bool) $request->request->get('shown', false);
-
-        // Only a module page the settings page lists can be stored.
-        $known = array_column($this->menuModuleCards(MenuTabs::fromDatabase($this->legacyContext())), 'class_name');
-        if (!in_array($className, $known, true)) {
-            return new JsonResponse(['saved' => false], Response::HTTP_BAD_REQUEST);
-        }
-
-        MenuModules::set($className, $shown);
-
-        return new JsonResponse(['saved' => true, 'shown' => $shown]);
+        return (string) $this->getService('ps_edition_basic.module')->getAssetUrl($path);
     }
 
     public function indexAction(): Response
@@ -193,58 +79,14 @@ class AdminPsEditionBasicController extends FrameworkBundleAdminController
         if (intval($this->legacyContext()->employee->id_profile) !== 1) {
             \Tools::redirectAdmin($this->legacyContext()->link->getAdminLink('AdminDashboard'));
         }
-        $modulePsEditionBasic = $this->getService('ps_edition_basic.module');
 
-        $jsLink = $modulePsEditionBasic->getAssetUrl((string) $modulePsEditionBasic->getParameter('ps_edition_basic.edition_basic_homepage_js'));
-
-        $tabs = MenuTabs::fromDatabase($this->legacyContext());
-
-        /**
-         * @var string|string[]
-         */
-        $shopCountry = $this->legacyContext()->country->iso_code;
-        if (is_array($shopCountry)) { // Country might be an array
-            $shopCountry = $shopCountry[array_key_first($shopCountry)] ?? '';
-        }
-        $shopCountry = strtolower($shopCountry);
-
-        $cacheClearApiUrl = $this->buildAdminUrl('ps_edition_basic_clean_mbo_cache');
-
-        return $this->render('@Modules/ps_edition_basic/views/templates/admin/homepage.html.twig', [
+        return $this->render('@Modules/ps_edition_basic/views/templates/admin/' . $this->template(), array_merge([
             'layoutTitle' => $this->layoutTitle(),
             'enableSidebar' => true,
-            'jsLink' => $jsLink,
-            'menuModules' => $this->showsMenuModules() ? $this->menuModuleCards($tabs) : [],
-            'menuModulesTexts' => [
-                'title' => $this->translate('Modules'),
-                'description' => $this->translate('Choose the module pages shown in the menu.'),
-                'switch' => $this->translate('Show in the menu'),
-                'error' => $this->translate('The change could not be saved. Reload the page and try again.'),
+            'pageAssets' => [
+                'css' => $this->assetUrl('views/css/pages.css'),
+                'js' => $this->assetUrl('views/js/pages.js'),
             ],
-            'menuModulesUrl' => $this->getService('router')->generate('ps_edition_basic_menu_module'),
-            'menuModulesAssets' => [
-                'css' => $modulePsEditionBasic->getAssetUrl('views/css/menu-modules.css'),
-                'js' => $modulePsEditionBasic->getAssetUrl('views/js/menu-modules.js'),
-            ],
-            'jsContext' => json_encode([
-                'CACHE_CLEAR_API_URL' => $cacheClearApiUrl,
-                'moduleName' => $modulePsEditionBasic->displayName,
-                'moduleSlug' => $modulePsEditionBasic->name,
-                'moduleVersion' => $modulePsEditionBasic->version,
-                // Updates never come from PrestaShop Addons: they would replace this build.
-                'moduleIsUpdatable' => false,
-                'moduleUpdateLink' => '',
-                'shopName' => (string) \Configuration::get('PS_SHOP_NAME'),
-                'isShopEnabled' => (bool) \Configuration::get('PS_SHOP_ENABLE'),
-                'tabs' => MenuTabs::withoutHiddenPages(
-                    $this->filter_settings_tabs_recursive($tabs, Lists::settings(), Lists::settingsExcluded())
-                ),
-                'locale' => $this->legacyContext()->language->iso_code,
-                'shopCountry' => $shopCountry,
-                // Module pages get their own section with a menu switch, drawn by
-                // the template rather than by this app, which has no switch.
-                'modulesTabs' => [],
-            ]),
-        ]);
+        ], $this->pageVariables()));
     }
 }

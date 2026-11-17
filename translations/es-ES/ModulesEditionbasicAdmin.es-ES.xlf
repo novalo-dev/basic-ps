@@ -2,159 +2,19 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
   <file original="admin-dev" source-language="en" target-language="es-ES" datatype="plaintext">
     <body>
-      <trans-unit id="ed56c088e223462171cc99f1a9b37785">
-        <source>PrestaShop Edition Basic</source>
-        <target state="needs-translation">PrestaShop Edition Basic</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="6a90fc4626c573c45b029834f434f30a">
-        <source>PrestaShop Edition Basic.</source>
-        <target state="needs-translation">PrestaShop Edition Basic.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="8cf04a9734132302f96da8e113e80ce5">
-        <source>Home</source>
-        <target state="needs-translation">Home</target>
-        <note>Line: </note>
-      </trans-unit>
       <trans-unit id="f4f70727dc34561dfde1a3c529b6205c">
         <source>Settings</source>
         <target state="translated">Ajustes</target>
         <note>Line: </note>
       </trans-unit>
-      <trans-unit id="cb2f228df35024a7f8895614134b651d">
-        <source>Customize your Domain Name</source>
-        <target state="translated">Personalizar el nombre de dominio</target>
+      <trans-unit id="254f642527b45bc260048e30704edb39">
+        <source>Configuration</source>
+        <target state="translated">Configuración</target>
         <note>Line: </note>
       </trans-unit>
-      <trans-unit id="d0c78c13ebd41f2a5e85bcdc760c556b">
-        <source>Customize your domain name to boost your store's search engine ranking.</source>
-        <target state="translated">Personaliza tu nombre de dominio para mejorar el posicionamiento de tu tienda en los buscadores.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="862cd24333aa5c27beb1ec8af6b4766e">
-        <source>View documentation</source>
-        <target state="translated">Ver documentación</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="e09e0133e1c69592adfd5c3f69663bd0">
-        <source>https://help-center.prestashop.com/fr/articles/11530021421714-changer-le-nom-de-domaine</source>
-        <target state="translated">https://help-center.prestashop.com/en/articles/11530021421714-change-the-domain-name</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="1116ed9b82405b666479000dcc482f84">
-        <source>Skip this step</source>
-        <target state="translated">Omitir este paso</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="8422e56d95ab9587169f917f53a23a43">
-        <source>Add your First Product</source>
-        <target state="translated">Añadir un primer producto</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="d4c43599c3d803321cac28609976291b">
-        <source>Expand your catalog with your very first product</source>
-        <target state="translated">Enriquece tu catálogo añadiendo tu primer producto</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="4ab7d549596c13206e215c9d0f26000e">
-        <source>https://help-center.prestashop.com/fr/articles/11637213915666-ajouter-un-nouveau-produit</source>
-        <target state="translated">https://help-center.prestashop.com/en/articles/11637213915666-add-a-new-product</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="dc16a8bae9c316f56d4db39800bfa86a">
-        <source>Add a Product</source>
-        <target state="translated">Añadir un producto</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="bb324583a12984d72eeb70c2c38d6cda">
-        <source>Configure your Payment Options</source>
-        <target state="translated">Configurar los métodos de pago</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="b0f2ff3544cea0f250b4ac64c96991ad">
-        <source>Enhance your customers' shopping experience by offering multiple payment options on your store.</source>
-        <target state="translated">Mejora la experiencia de compra de tus clientes ofreciendo varios métodos de pago en tu tienda.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="5cb09dc063501817d498214ccb99c0f3">
-        <source>https://help-center.prestashop.com/fr/articles/11640755605778-configurer-les-moyens-de-paiement</source>
-        <target state="translated">https://help-center.prestashop.com/en/articles/11640755605778-configure-payment-methods</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="5fec693e2128dcfb09ac35626dd4a572">
-        <source>Configure your Delivery Options</source>
-        <target state="translated">Configurar los métodos de envío</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="1ec525eb1946fbcb914525fe1ba7f4e0">
-        <source>Configure delivery options to send your products.</source>
-        <target state="translated">Configura métodos de entrega para enviar tus productos.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="266164f640e3fd7ac655e47c40e2fc78">
-        <source>https://help-center.prestashop.com/fr/articles/11615624974994-configurer-les-modes-de-livraison</source>
-        <target state="translated">https://help-center.prestashop.com/en/articles/11615624974994-configure-the-shipping-methods</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="ea199c50d679d09dbfe7b272a5dfc230">
-        <source>Meet your Legal Obligations</source>
-        <target state="translated">Cumplir las obligaciones legales</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="e917d41a7d894760a649f595426555cb">
-        <source>Ensure your store complies with legal requirements before you begin selling.</source>
-        <target state="translated">Asegúrate de que tu tienda cumple los requisitos legales antes de empezar a vender.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="53bfc8c2e07fa9a1407869eeeb1e975b">
-        <source>https://help-center.prestashop.com/fr/articles/11644037761042-repondre-aux-obligations-legales</source>
-        <target state="translated">https://help-center.prestashop.com/en/articles/11644037761042-comply-with-legal-requirements</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="1ddeefbce4668401f03fae436fc6674e">
-        <source>Add a Logo</source>
-        <target state="translated">Añadir un logotipo</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="87740d5668147a7ecd2ecba915a5aaad">
-        <source>Add Logos for your store (Header, E-mails, Invoice, and Favicon)</source>
-        <target state="translated">Añade los logotipos que aparecerán en tu tienda (cabecera, e-mails, facturas y favicon)</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="855a91c6a0e71a12bc94322e7b3685c4">
-        <source>https://help-center.prestashop.com/fr/articles/11674550243474-ajouter-un-logo-et-une-favicon</source>
-        <target state="translated">https://help-center.prestashop.com/en/articles/11674550243474-add-a-logo-and-a-favicon</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="943e3c8b871d7ac7efd2d2f04640b791">
-        <source>Select and Customize your Theme</source>
-        <target state="translated">Elegir y configurar un tema</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="6d00d1805e43ec87dd2e998b24b108b6">
-        <source>Choose and customize a theme that defines the look of your store</source>
-        <target state="translated">Selecciona y configura el tema que definirá el diseño de tu tienda</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="ab7d62a1228738d0bc46e115b5e71c33">
-        <source>https://help-center.prestashop.com/fr/articles/11663976521490-choisir-et-configurer-un-theme</source>
-        <target state="translated">https://help-center.prestashop.com/en/articles/11663976521490-choose-and-configure-a-theme</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="c68308ce7ca65863ba890fdaf48c286a">
-        <source>Activate new menu and breadcrumb</source>
-        <target state="translated">Activar nuevo menú y ruta de navegación</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="fe5d926454b6a8144efce13a44d019ba">
-        <source>Invalid Configuration value</source>
-        <target state="translated">Valor de configuración no válido</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="c888438d14855d7d96a2724ee9c306bd">
-        <source>Settings updated</source>
-        <target state="translated">Ajustes actualizan</target>
+      <trans-unit id="0d6b68d0e34ebe57dde169c2d05ecc41">
+        <source>Configure your shop in a few clicks</source>
+        <target state="translated">Configura tu tienda en unos clics</target>
         <note>Line: </note>
       </trans-unit>
       <trans-unit id="bf17ac149e2e7a530c677e9bd51d3fd2">
@@ -177,9 +37,199 @@
         <target state="translated">No se pudo guardar el cambio. Recarga la página e inténtalo de nuevo.</target>
         <note>Line: </note>
       </trans-unit>
+      <trans-unit id="1ac3d31760fed0a921e411d435191348">
+        <source>Secure your store's domain so customers can trust it and find it easily.</source>
+        <target state="translated">Protege el dominio de tu tienda para que los clientes puedan confiar en él y encontrarlo fácilmente.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e2ab0cecd2ced0b94a1bd11520a58156">
+        <source>Follow our legal assistant to create your own shop policies.</source>
+        <target state="translated">Sigue a nuestro asistente legal para crear tus propias políticas de tienda.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="a4ff7a4bd66ea4be29e7b1b8e154a062">
+        <source>Manage your subscription according to your needs.</source>
+        <target state="translated">Gestiona tu suscripción según tus necesidades.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d1aa169b81493d759c2ac2f9cf29bbaf">
+        <source>Install, configure and update your modules.</source>
+        <target state="translated">Instala, configura y actualiza tus módulos.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="8d71ce8eaeba563705566a66691d390e">
+        <source>Customize the theme, logo, pages and positions of your store.</source>
+        <target state="translated">Personaliza el tema, el logotipo, las páginas y las posiciones de tu tienda.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="6df6648823fe473e015cf94a78efd09d">
+        <source>Choose or combine the shipping methods that suit you best.</source>
+        <target state="translated">Elige o combina los métodos de envío que más te convengan.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c6b50ac6b4ce03f1d069a805e6b4ffb5">
+        <source>Choose the payment methods available with one of the payment providers approved by PrestaShop.</source>
+        <target state="translated">Elige los métodos de pago disponibles con uno de los proveedores de pago aprobados por PrestaShop.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="0d6d7a2a94b1552f93693b406b83fc3e">
+        <source>Display the different countries, languages, and currencies you want to activate on your store.</source>
+        <target state="translated">Muestra los diferentes países, idiomas y divisas que deseas activar en tu tienda.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="6ad0df5294c242dc7e2ab11b087ead5f">
+        <source>Configure all the technical settings to make your shop work.</source>
+        <target state="translated">Configura todos los ajustes técnicos para que tu tienda funcione.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="084ffde80fa7f47877a183b2e2430aa5">
+        <source>Configure the operation of your shop.</source>
+        <target state="translated">Configura el funcionamiento de tu tienda.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="26a1c96fc104fc3e60a7c896d81a0c62">
+        <source>Restore your shop in a few clicks.</source>
+        <target state="translated">Restaura tu tienda en unos pocos clics.</target>
+        <note>Line: </note>
+      </trans-unit>
       <trans-unit id="efdaf9f44ce968366fa78277263abc1d">
         <source>Help Center</source>
         <target state="translated">Centro de ayuda</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="dde8a87ca50c8347a1970c711bba844b">
+        <source>Your shop is online.</source>
+        <target state="translated">Tu tienda está online.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="bf8bd45551c57db758d5611af4afb316">
+        <source>Use maintenance mode when editing your store</source>
+        <target state="translated">Utiliza el modo de mantenimiento al modificar la tienda</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="57a98f96b96ebcdac6e5bc5df1a80bb8">
+        <source>Enter maintenance mode</source>
+        <target state="translated">Cambiar al modo de mantenimiento</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="68d344db4c1c74f86badb1540240196b">
+        <source>Your shop is offline.</source>
+        <target state="translated">Tu tienda está desconectada.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="9f369326c9e28737fafe2b41fada7015">
+        <source>Your visitors do not have access to your store. You can put it online from the maintenance page</source>
+        <target state="translated">Tus visitantes no pueden acceder a tu tienda. Puedes ponerla online desde la página</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="26c3a6b1692e175c72d9ab1df23aac8a">
+        <source>Maintenance.</source>
+        <target state="translated">Mantenimiento.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="728d699796b955a78ac93adaf51ba4dd">
+        <source>Go to maintenance page</source>
+        <target state="translated">Ir a la página de mantenimiento</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="73878c19cdc6ef2ab0d0fac6943cc958">
+        <source>Need help ?</source>
+        <target state="translated">¿Necesitas ayuda?</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="4364aeef01f62738a238514a1ca48610">
+        <source>A question, a doubt about a feature? Consult the documentation of our</source>
+        <target state="translated">¿Tienes preguntas o dudas sobre alguna funcionalidad? Consulta la documentación de nuestro</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d2ba4a48cb810ff72178d2f2b4a8214c">
+        <source>Help Center.</source>
+        <target state="translated">Centro de Ayuda.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="393a97e3a2a1d825af250541cc912bd9">
+        <source>Access the documentation</source>
+        <target state="translated">Acceder a la documentación</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="4f6ec977fab3d4517fae2da430265344">
+        <source>THE HELP YOU NEED, WHEN YOU NEED IT</source>
+        <target state="translated">LA AYUDA QUE NECESITA, CUANDO LA NECESITA</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="9da58fed8ba8ec1e6988afd1519906eb">
+        <source>Focus on your business. Let us take care of the technical aspects.</source>
+        <target state="translated">Concéntrese en su negocio. Deje que nosotros nos ocupemos de los aspectos técnicos.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="307e905d6581420b805f7783c98b0a6a">
+        <source>Discover our offers</source>
+        <target state="translated">Descubra nuestras ofertas</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="1819001b72329e2ef5799fe504238035">
+        <source>Explore</source>
+        <target state="translated">Descubrir</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="488755e9bdd442158ace83d32ba53d83">
+        <source>PrestaShop Diagnostic Ticket</source>
+        <target state="translated">Ticket de diagnóstico de PrestaShop</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="10ef26294c72871e23872b29c7cb3ebc">
+        <source>Benefit from a complete diagnosis of your site with the help of PrestaShop experts!</source>
+        <target state="translated">Benefíciese de un diagnóstico completo de su sitio web con la ayuda de los expertos de PrestaShop.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="63789c176507a7d4b8cf554fc7a4c2ab">
+        <source>Quick-start help</source>
+        <target state="translated">Ayuda rápida</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b6a01cd633138ab42d86445fc399f55f">
+        <source>You've downloaded PrestaShop software and need help to quickly install your online store on your server?</source>
+        <target state="translated">¿Ha descargado el software PrestaShop y necesita ayuda para instalar rápidamente su tienda en línea en su servidor?</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="eff3c3d305fd17f5cd46ad043428d5c2">
+        <source>Safety pack</source>
+        <target state="translated">Paquete de seguridad</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="6b4f13471ee3a9d330793fb89d4907ef">
+        <source>To address the problem of security vulnerabilities in PrestaShop, we offer a Security Pack comprising an analysis and any associated security actions.</source>
+        <target state="translated">Para abordar el problema de las vulnerabilidades de seguridad en PrestaShop, ofrecemos un paquete de seguridad que incluye un análisis y las medidas de seguridad asociadas.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d9cd31a378958e737784b2793707e8b7">
+        <source>SEO Pack</source>
+        <target state="translated">Paquete SEO</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="25b7e666014b0a7265178f1d5cbda696">
+        <source>Our experts identify and analyze the crawling errors encountered by the Google Bot using the Google Search Console interface. Following the analysis, they provide you with the technical improvements you need to implement for your search engine optimization, and take corrective action.</source>
+        <target state="translated">Nuestros expertos identifican y analizan los errores de exploración encontrados por el robot de Google a través de la interfaz de Google Search Console. Tras el análisis, le proporcionan las mejoras técnicas que debe introducir en su optimización para motores de búsqueda y adoptan medidas correctivas.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c68308ce7ca65863ba890fdaf48c286a">
+        <source>Activate new menu and breadcrumb</source>
+        <target state="translated">Activar nuevo menú y ruta de navegación</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c888438d14855d7d96a2724ee9c306bd">
+        <source>Settings updated</source>
+        <target state="translated">Ajustes actualizan</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ed56c088e223462171cc99f1a9b37785">
+        <source>PrestaShop Edition Basic</source>
+        <target state="translated">PrestaShop Edition Basic</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="6a90fc4626c573c45b029834f434f30a">
+        <source>PrestaShop Edition Basic.</source>
+        <target state="translated">PrestaShop Edition Basic.</target>
         <note>Line: </note>
       </trans-unit>
     </body>

@@ -17,7 +17,34 @@
  * International Registered Trademark & Property of PrestaShop SA
  *#}
 {% extends '@PrestaShop/Admin/layout.html.twig' %}
+{% import '@Modules/ps_edition_basic/views/templates/admin/cards.html.twig' as ui %}
 
 {% block content %}
-    <div id="vue-app" data-context="{{ jsContext|e }}"></div>
+    <link rel="stylesheet" href="{{ pageAssets.css }}">
+    <div id="peb-settings" class="puik-style peb-page">
+        <div class="flex">
+            <div class="flex flex-col gap-y-5 w-full mx-auto lg:max-w-3xl xl:max-w-5xl">
+                <div class="flex flex-col gap-y-0.5" data-test="configuration-block">
+                    <h1 class="puik-h3" data-test="title-block">{{ texts.title }}</h1>
+                    <span data-test="description-block">{{ texts.description }}</span>
+                </div>
+                {% for card in cards %}
+                    {{ ui.card(card, false) }}
+                {% endfor %}
+
+                {% if menuModules is not empty %}
+                    <div id="peb-menu-modules" class="flex flex-col gap-y-5" data-url="{{ menuModulesUrl }}" data-error="{{ texts.error }}">
+                        <div class="flex flex-col gap-y-0.5">
+                            <h1 class="puik-h3">{{ texts.modulesTitle }}</h1>
+                            <span>{{ texts.modulesDescription }}</span>
+                        </div>
+                        {% for card in menuModules %}
+                            {{ ui.card(card, texts.switch) }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <script src="{{ pageAssets.js }}" defer></script>
 {% endblock %}

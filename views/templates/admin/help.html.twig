@@ -1,0 +1,93 @@
+{#**
+ * 2007-2020 PrestaShop and Contributors
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License 3.0 (AFL-3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/AFL-3.0
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * @author    PrestaShop SA <contact@prestashop.com>
+ * @copyright 2007-2020 PrestaShop SA and Contributors
+ * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
+ * International Registered Trademark & Property of PrestaShop SA
+ *#}
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+
+{% block content %}
+    <link rel="stylesheet" href="{{ pageAssets.css }}">
+    <div id="peb-help" class="puik-style peb-page">
+        <div class="max-w-[1134px] mx-auto">
+            {% set variant = shopEnabled ? 'success' : 'warning' %}
+            <div class="puik-alert puik-alert--{{ variant }}" aria-live="polite">
+                <div class="puik-alert__container">
+                    <div class="puik-alert__content">
+                        <div class="puik-icon puik-alert__icon" style="font-size: 1.25rem;">{{ shopEnabled ? 'check_circle' : 'warning' }}</div>
+                        <div class="puik-alert__text">
+                            {% if shopEnabled %}
+                                <p class="puik-alert__title">{{ texts.onlineTitle }}</p>
+                                <span class="puik-alert__description">{{ texts.onlineDescription }}</span>
+                            {% else %}
+                                <p class="puik-alert__title">{{ texts.offlineTitle }}</p>
+                                <span class="puik-alert__description">{{ texts.offlineDescription }} <strong>{{ texts.offlineLink }}</strong></span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <a href="{{ maintenanceUrl }}" class="puik-button puik-button--{{ variant }} puik-button--md puik-button--no-wrap puik-alert__button">{{ shopEnabled ? texts.onlineButton : texts.offlineButton }}</a>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <div class="puik-card puik-card--default flex flex-row items-center shrink-0 px-4 py-6 gap-6 bg-green-100 sm:shrink sm:p-8 xl:py-[34px] 2xl:py-[38px]">
+                    <div class="w-1/3"><img class="mx-auto" src="{{ images.help }}" alt=""></div>
+                    <div class="w-2/3">
+                        <h3 class="puik-h4 font-bold md:custom-puik-h3">{{ texts.helpTitle }}</h3>
+                        <div class="my-4 text-xs md:text-sm">{{ texts.helpDescription }} <strong>{{ texts.helpCenter }}</strong></div>
+                        <a href="{{ helpUrl }}" target="_blank" rel="noopener" class="puik-button puik-button--primary puik-button--md puik-button--no-wrap h-auto">
+                            <span class="puik-icon puik-button__left-icon" style="font-size: 1.25rem;">assignment_turned_in</span>{{ texts.helpButton }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="puik-card puik-card--blue flex flex-col lg:flex-row items-start shrink-0 px-4 py-6 gap-6 sm:shrink sm:p-8 xl:py-[34px] 2xl:py-[38px] peb-care mt-4">
+                <div class="lg:w-4/12 w-full">
+                    <h2 class="puik-brand-h1 font-bold">{{ texts.careTitle }}</h2>
+                    <h3 class="puik-h3 font-semibold mt-2 leading-6 text-lg">{{ texts.careDescription }}</h3>
+                    <a href="{{ careUrl }}" target="_blank" rel="noopener" class="puik-button puik-button--secondary puik-button--lg puik-button--no-wrap mt-3">
+                        <span class="peb-care__link">{{ texts.careButton }}</span><span class="puik-icon puik-button__right-icon" style="font-size: 1.25rem;">keyboard_arrow_right</span>
+                    </a>
+                </div>
+                <div class="lg:w-7/12 w-full">
+                    <div class="peb-care__track">
+                        {% for offer in offers %}
+                            <div class="puik-card puik-card--default h-full">
+                                <div class="puik-grid ml-0">
+                                    <div class="col-span-3"><img src="{{ images.offer }}" alt=""></div>
+                                    <div class="col-span-9 w-10/12"><p class="font-bold text-sm leading-4">{{ offer.title }}</p></div>
+                                </div>
+                                <span class="text-xs peb-care__text">{{ offer.description }}</span>
+                                <div class="mt-auto">
+                                    <a href="{{ offer.url }}" target="_blank" rel="noopener" class="puik-button puik-button--tertiary puik-button--md puik-button--fluid puik-button--no-wrap">
+                                        <span class="puik-icon puik-button__left-icon" style="font-size: 1.25rem;">launch</span>{{ texts.offerButton }}
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="w-1/12 lg:block hidden">
+                    <span class="flex items-center">
+                        <span class="puik-icon btn-slider pr-[2px] mr-2 peb-care__prev" style="font-size: 16px;">keyboard_arrow_left</span>
+                        <span class="puik-icon btn-slider pl-[2px] peb-care__next" style="font-size: 16px;">keyboard_arrow_right</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{{ pageAssets.js }}" defer></script>
+{% endblock %}

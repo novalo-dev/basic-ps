@@ -27,24 +27,15 @@ trait UseDisplayBackOfficeHeader
 {
     public function hookDisplayBackOfficeHeader(): string
     {
-        // The menu app draws the simplified menu and the settings page; without the
-        // menu there is nothing for it to do on the other pages.
+        // The simplified menu and breadcrumb are drawn by the server; this script
+        // only puts them in place and opens their sections.
         if (!\Configuration::get('SMB_IS_NEW_MENU_ENABLED')) {
             return '';
         }
 
-        $this->context->controller->addJS($this->getAssetUrl('views/js/hooksNewMenu.js'));
-        $this->context->controller->addCSS($this->getAssetUrl('views/css/new_menu.css'));
+        $this->context->controller->addJS($this->getAssetUrl('views/js/menu.js'));
         $this->context->controller->addCSS($this->getAssetUrl('views/css/menu.css'));
 
-        $scriptUrl = $this->getAssetUrl((string) $this->getParameter('ps_edition_basic.edition_basic_homepage_js'));
-        $locale = htmlspecialchars($this->context->language->iso_code, ENT_QUOTES);
-
-        return <<<END
-            <script>
-                window.userLocale = '{$locale}';
-            </script>
-            <script type="module" src="{$scriptUrl}"></script>
-        END;
+        return '';
     }
 }

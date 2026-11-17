@@ -23,6 +23,13 @@ declare(strict_types=1);
 
 namespace PrestaShop\Module\PsEditionBasic\Controller;
 
+use PrestaShop\Module\PsEditionBasic\Config\Lists;
+use PrestaShop\Module\PsEditionBasic\Config\MenuModules;
+use PrestaShop\Module\PsEditionBasic\Helper\MenuTabs;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
 class AdminPsEditionBasicSettingsController extends AdminPsEditionBasicController
 {
     protected function layoutTitle(): string
@@ -30,8 +37,192 @@ class AdminPsEditionBasicSettingsController extends AdminPsEditionBasicControlle
         return $this->translate('Settings');
     }
 
-    protected function showsMenuModules(): bool
+    protected function template(): string
     {
-        return true;
+        return 'settings.html.twig';
+    }
+
+    protected function pageVariables(): array
+    {
+        $tabs = MenuTabs::fromDatabase($this->legacyContext());
+
+        return [
+            'texts' => [
+                'title' => $this->translate('Configuration'),
+                'description' => $this->translate('Configure your shop in a few clicks'),
+                'modulesTitle' => $this->translate('Modules'),
+                'modulesDescription' => $this->translate('Choose the module pages shown in the menu.'),
+                'switch' => $this->translate('Show in the menu'),
+                'error' => $this->translate('The change could not be saved. Reload the page and try again.'),
+            ],
+            'cards' => $this->settingsCards($tabs),
+            'menuModules' => $this->menuModuleCards($tabs),
+            'menuModulesUrl' => $this->getService('router')->generate('ps_edition_basic_menu_module'),
+        ];
+    }
+
+    /**
+     * What each configuration card says and shows, as on the original page.
+     *
+     * @return array<string, array{0: string, 1: string}>
+     */
+    private function cardTexts(): array
+    {
+        return [
+            'AdminSmbEditionManageDomainNameController' => [$this->translate("Secure your store's domain so customers can trust it and find it easily."), 'web'],
+            'AdminPsxlegalassistantController' => [$this->translate('Follow our legal assistant to create your own shop policies.'), 'collections_bookmark'],
+            'AdminSmbEditionManageSubscriptionController' => [$this->translate('Manage your subscription according to your needs.'), 'loyalty'],
+            'AdminParentModulesSf' => [$this->translate('Install, configure and update your modules.'), 'extension'],
+            'AdminParentThemes' => [$this->translate('Customize the theme, logo, pages and positions of your store.'), 'desktop_mac'],
+            'AdminParentShipping' => [$this->translate('Choose or combine the shipping methods that suit you best.'), 'local_shipping'],
+            'AdminParentPayment' => [$this->translate('Choose the payment methods available with one of the payment providers approved by PrestaShop.'), 'credit_card'],
+            'AdminInternational' => [$this->translate('Display the different countries, languages, and currencies you want to activate on your store.'), 'language'],
+            'ShopParameters' => [$this->translate('Configure all the technical settings to make your shop work.'), 'stars'],
+            'AdminAdvancedParameters' => [$this->translate('Configure the operation of your shop.'), 'settings_ethernet'],
+            'AdminNtbackupandrestore' => [$this->translate('Restore your shop in a few clicks.'), 'restore'],
+        ];
+    }
+
+    /**
+     * The configuration sections, each a card opening on its pages.
+     *
+     * @param array<int, array<string, mixed>> $tabs the whole back office menu
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function settingsCards(array $tabs): array
+    {
+        $texts = $this->cardTexts();
+        $cards = [];
+        $sections = MenuTabs::withoutHiddenPages($this->filterSettingsTabs($tabs, Lists::settings(), Lists::settingsExcluded()));
+        foreach ($sections as $tab) {
+            $className = (string) $tab['class_name'];
+            $cards[] = [
+                'class_name' => $className,
+                'name' => (string) $tab['name'],
+                'href' => (string) $tab['href'],
+                'icon' => $texts[$className][1] ?? 'extension',
+                'description' => $texts[$className][0] ?? '',
+                'links' => self::links($tab['sub_tabs'] ?? []),
+            ];
+        }
+
+        return $cards;
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $pages
+     *
+     * @return array<int, array{name: string, href: string}>
+     */
+    private static function links(array $pages): array
+    {
+        $links = [];
+        foreach ($pages as $page) {
+            if ((int) ($page['active'] ?? 1) !== 0 && !empty($page['href'])) {
+                $links[] = ['name' => (string) $page['name'], 'href' => (string) $page['href']];
+            }
+        }
+
+        return $links;
+    }
+
+    /**
+     * The sections the settings page lists, found at any depth of the menu, in the
+     * order of the list.
+     *
+     * @param array<int, array<string, mixed>> $tabs
+     * @param string[] $whitelist
+     * @param string[] $blacklist pages left out of the advanced parameters
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function filterSettingsTabs(array $tabs, array $whitelist, array $blacklist = []): array
+    {
+        $filtered = [];
+
+        foreach ($tabs as $tab) {
+            if (in_array($tab['class_name'], $whitelist, true)) {
+                if ($tab['class_name'] === 'AdminAdvancedParameters') {
+                    $tab['sub_tabs'] = array_values(array_filter($tab['sub_tabs'], function (array $page) use ($blacklist): bool {
+                        return !in_array($page['wording'], $blacklist, true);
+                    }));
+                }
+                $filtered[] = $tab;
+                continue;
+            }
+
+            $filtered = array_merge($filtered, $this->filterSettingsTabs($tab['sub_tabs'], $whitelist, $blacklist));
+        }
+
+        $ordered = [];
+        foreach ($whitelist as $className) {
+            foreach ($filtered as $tab) {
+                if ($tab['class_name'] === $className) {
+                    $ordered[] = $tab;
+                    break;
+                }
+            }
+        }
+
+        return $ordered;
+    }
+
+    /**
+     * The module pages of the back office, as cards for the settings page, each
+     * with whether the merchant switched it on in the menu.
+     *
+     * @param array<int, array<string, mixed>> $tabs the whole back office menu
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function menuModuleCards(array $tabs): array
+    {
+        $shown = MenuModules::shown();
+        $cards = [];
+        foreach (MenuTabs::moduleEntries($tabs, Lists::placed()) as $tab) {
+            // The module's own description says what the page is for, as the
+            // configuration cards do; its name stands in when it has none.
+            $description = '';
+            $module = empty($tab['module']) ? null : \Module::getInstanceByName((string) $tab['module']);
+            if ($module) {
+                $description = (string) ($module->description ?: $module->displayName);
+            }
+
+            $cards[] = [
+                'class_name' => (string) $tab['class_name'],
+                'name' => (string) ($tab['name'] ?: $tab['class_name']),
+                'href' => (string) $tab['href'],
+                'icon' => (string) ($tab['icon'] ?: 'extension'),
+                'description' => $description,
+                'shown' => in_array($tab['class_name'], $shown, true),
+                'links' => self::links($tab['sub_tabs'] ?? []),
+            ];
+        }
+
+        return $cards;
+    }
+
+    /**
+     * Saves the switch of one module card: the page shows in the menu or not.
+     */
+    public function toggleMenuModuleAction(Request $request): JsonResponse
+    {
+        if ((int) $this->legacyContext()->employee->id_profile !== 1) {
+            return new JsonResponse(['saved' => false], Response::HTTP_FORBIDDEN);
+        }
+
+        $className = (string) $request->request->get('class_name', '');
+        $shown = (bool) $request->request->get('shown', false);
+
+        // Only a module page the settings page lists can be stored.
+        $known = array_column($this->menuModuleCards(MenuTabs::fromDatabase($this->legacyContext())), 'class_name');
+        if (!in_array($className, $known, true)) {
+            return new JsonResponse(['saved' => false], Response::HTTP_BAD_REQUEST);
+        }
+
+        MenuModules::set($className, $shown);
+
+        return new JsonResponse(['saved' => true, 'shown' => $shown]);
     }
 }

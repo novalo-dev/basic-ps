@@ -73,6 +73,15 @@ const check = async (name, run) => {
 // Views of the back office kept with the run, to look at the result rather than
 // only read it. On a manual run they are also written to
 // the log, which can be read where the run's files cannot be downloaded.
+// The simplified menu, drawn by the server and moved into the navigation bar by
+// the module's script: its entries, sections and their pages, in order.
+const menuReady = () => document.querySelectorAll('#peb-side-bar .peb-side-bar__row').length > 5;
+const menuEntries = () => [...document.querySelectorAll('#peb-side-bar .peb-side-bar__row, #peb-side-bar .peb-side-bar__links a')]
+    .map((entry) => ({
+        text: (entry.querySelector('.peb-side-bar__label') || entry).textContent.replace(/\s+/g, ' ').trim(),
+        href: (entry.closest('a') || {}).href || '',
+    }));
+
 const view = async (name, on = page) => {
     await on.waitForTimeout(1500);
     const file = `${shots}/view-${name}.jpg`;
@@ -379,18 +388,14 @@ if (signedIn) {
             page.waitForLoadState('load'),
             page.locator('button[name="submitSmbConfiguration"]').click(),
         ]);
-        await page.locator('wc-side-bar').waitFor({ state: 'attached', timeout: 30000 });
+        await page.locator('#peb-side-bar').waitFor({ state: 'attached', timeout: 30000 });
     });
 
     let settingsUrl = '';
     let helpUrl = '';
     await check('the simplified menu', async () => {
-        await page.waitForFunction(() => {
-            const bar = document.querySelector('wc-side-bar');
-            return bar && bar.shadowRoot && bar.shadowRoot.querySelectorAll('a').length > 5;
-        }, null, { timeout: 30000 });
-        const entries = await page.evaluate(() => [...document.querySelector('wc-side-bar').shadowRoot.querySelectorAll('a')]
-            .map((anchor) => ({ text: anchor.textContent.replace(/\s+/g, ' ').trim(), href: anchor.href })));
+        await page.waitForFunction(menuReady, null, { timeout: 30000 });
+        const entries = await page.evaluate(menuEntries);
         const has = (word) => entries.some((entry) => entry.text.includes(word));
         for (const word of ['Dashboard', 'Help Center', 'Orders', 'Catalog', 'Settings']) {
             if (!has(word)) {
@@ -414,6 +419,33 @@ if (signedIn) {
             throw new Error('the Settings entry has no link');
         }
         await view('2-simplified-menu');
+
+        // A section opens on all its pages, however many modules add: the menu
+        // component this one replaced cut them off at 24rem.
+        const longest = await page.evaluate(() => {
+            let best = null;
+            for (const group of document.querySelectorAll('#peb-side-bar .peb-side-bar__group')) {
+                if (!best || group.querySelectorAll('a').length > best.querySelectorAll('a').length) {
+                    best = group;
+                }
+            }
+            return best ? best.querySelector('[data-test]').getAttribute('data-test') : null;
+        });
+        if (longest) {
+            const row = page.locator(`#peb-side-bar [data-test="${longest}"]`);
+            if (await row.getAttribute('aria-expanded') !== 'true') {
+                await row.click();
+            }
+            const cut = await page.evaluate((test) => {
+                const links = document.querySelector(`#peb-side-bar [data-test="${test}"]`).closest('.peb-side-bar__group').querySelector('.peb-side-bar__links');
+                const box = links.getBoundingClientRect();
+                return [...links.querySelectorAll('a')].filter((a) => a.getBoundingClientRect().bottom > box.bottom + 1 || a.getBoundingClientRect().height === 0).map((a) => a.textContent.trim());
+            }, longest);
+            if (cut.length > 0) {
+                throw new Error(`pages cut off in the open section: ${cut.join(', ')}`);
+            }
+        }
+
         const orders = entries.find((entry) => /Orders$/.test(entry.text));
         if (orders && orders.href) {
             await open(orders.href);
@@ -423,9 +455,11 @@ if (signedIn) {
 
     await check('the settings page', async () => {
         await open(settingsUrl);
-        await page.locator('#vue-app').waitFor({ state: 'attached', timeout: 30000 });
-        await page.waitForFunction(() => document.querySelectorAll('#vue-app a[href]').length >= 7, null, { timeout: 30000 });
-        const titles = await page.evaluate(() => JSON.parse(document.querySelector('#vue-app').dataset.context).tabs.map((tab) => tab.class_name));
+        await page.locator('#peb-settings').waitFor({ state: 'attached', timeout: 30000 });
+        const titles = await page.evaluate(() => [...document.querySelectorAll('#peb-settings .peb-card:not([data-class-name]) [data-test$="-block"]')]
+            .map((block) => block.getAttribute('data-test'))
+            .filter((test) => test !== 'title-block' && test !== 'description-block')
+            .map((test) => test.replace(/-block$/, '')));
         if (titles[0] !== 'AdminParentModulesSf' || titles[1] !== 'AdminParentThemes') {
             throw new Error(`the cards start with ${titles.slice(0, 2).join(', ')} instead of Modules and Design`);
         }
@@ -436,8 +470,8 @@ if (signedIn) {
     // The help blocks of PrestaShop's original homepage, links only.
     await check('the help center', async () => {
         await open(helpUrl);
-        await page.waitForFunction(() => document.querySelectorAll('#vue-app a[href*="care-center.prestashop.com"]').length >= 5, null, { timeout: 30000 });
-        const outside = await page.evaluate(() => [...document.querySelectorAll('#vue-app a[href^="http"]')]
+        await page.waitForFunction(() => document.querySelectorAll('#peb-help a[href*="care-center.prestashop.com"]').length >= 5, null, { timeout: 30000 });
+        const outside = await page.evaluate(() => [...document.querySelectorAll('#peb-help a[href^="http"]')]
             .map((anchor) => new URL(anchor.href).hostname)
             .filter((host) => host !== location.hostname && !/(^|\.)prestashop\.com$/.test(host)));
         if (outside.length > 0) {
@@ -448,21 +482,19 @@ if (signedIn) {
 
     // Module pages are off the menu until switched on from their settings card.
     await check('a module page switched on shows in the menu', async () => {
+        await open(settingsUrl);
         const cards = page.locator('#peb-menu-modules [data-class-name]');
-        await page.waitForFunction(() => {
-            const section = document.getElementById('peb-menu-modules');
-            return !section || (!section.hidden && section.closest('#vue-app'));
-        }, null, { timeout: 30000 });
         if (await cards.count() === 0) {
             console.log('no module page on this shop: nothing to switch');
             return;
         }
         // A card whose module has pages of its own opens on their links in place.
-        const opening = page.locator('#peb-menu-modules .peb-menu-modules__link[aria-expanded]').first();
+        const opening = page.locator('#peb-menu-modules .peb-card__header[aria-expanded]').first();
         if (await opening.count() > 0) {
             const before = page.url();
             await opening.click();
-            if (page.url() !== before || !await opening.locator('xpath=ancestor::*[@data-class-name]').locator('.peb-menu-modules__pages').isVisible()) {
+            const pages = opening.locator('xpath=ancestor::*[@data-class-name]').locator('.peb-card__pages a').first();
+            if (page.url() !== before || !await pages.isVisible() || (await pages.boundingBox()).height === 0) {
                 throw new Error('a module card with pages does not open on them');
             }
             await opening.click();
@@ -471,8 +503,8 @@ if (signedIn) {
         const card = cards.first();
         const name = (await card.locator('h1').innerText()).trim();
         // An entry with sub-pages also holds its arrow icon's name: matched by inclusion.
-        const inMenu = async () => page.evaluate((label) => [...document.querySelector('wc-side-bar').shadowRoot.querySelectorAll('a')]
-            .some((anchor) => anchor.textContent.replace(/\s+/g, ' ').includes(label)), name);
+        const inMenu = async () => page.evaluate((label) => [...document.querySelectorAll('#peb-side-bar .peb-side-bar__label')]
+            .some((entry) => entry.textContent.replace(/\s+/g, ' ').includes(label)), name);
         if (await inMenu()) {
             throw new Error(`${name} is in the menu before its switch is on`);
         }
@@ -480,11 +512,10 @@ if (signedIn) {
         await toggle.click();
         await page.waitForFunction((el) => el.getAttribute('aria-checked') === 'true' && !el.hasAttribute('aria-busy'), await toggle.elementHandle(), { timeout: 30000 });
         await page.reload({ waitUntil: 'load' });
-        await page.waitForFunction(() => document.querySelector('wc-side-bar')?.shadowRoot?.querySelectorAll('a').length > 5, null, { timeout: 30000 });
+        await page.waitForFunction(menuReady, null, { timeout: 30000 });
         if (!await inMenu()) {
             throw new Error(`${name} is not in the menu once switched on`);
         }
-        await page.waitForFunction(() => !document.getElementById('peb-menu-modules').hidden, null, { timeout: 30000 });
         await view('5-module-switched-on');
     });
 }
@@ -505,7 +536,7 @@ if (signedIn && browserName === 'chromium') {
                 small.waitForLoadState('load'),
                 small.locator('form:has(input[type="password"]) button[type="submit"]').first().click(),
             ]);
-            await small.waitForFunction(() => document.querySelector('wc-side-bar')?.shadowRoot?.querySelectorAll('a').length > 5, null, { timeout: 30000 });
+            await small.waitForFunction(menuReady, null, { timeout: 30000 });
 
             const wide = await small.evaluate(() => document.documentElement.scrollWidth - innerWidth);
             if (wide > 1) {
@@ -528,27 +559,25 @@ if (signedIn && browserName === 'chromium') {
                 throw new Error('the menu does not open from its button');
             }
 
-            const settings = await small.evaluate(() => [...document.querySelector('wc-side-bar').shadowRoot.querySelectorAll('a')]
-                .map((anchor) => anchor.href).find((href) => /pseditionbasic\/settings/.test(href)));
+            const settings = (await small.evaluate(menuEntries)).map((entry) => entry.href).find((href) => /pseditionbasic\/settings/.test(href));
             if (!settings) {
                 throw new Error('no Settings entry in the menu');
             }
             await small.goto(settings, { waitUntil: 'load' });
-            await small.waitForFunction(() => document.querySelectorAll('#vue-app a[href]').length >= 7, null, { timeout: 30000 });
-            const overflow = await small.evaluate(() => [...document.querySelectorAll('#vue-app .puik-card')]
+            await small.locator('#peb-settings').waitFor({ state: 'attached', timeout: 30000 });
+            const overflow = await small.evaluate(() => [...document.querySelectorAll('#peb-settings .puik-card')]
                 .filter((card) => card.getBoundingClientRect().right > innerWidth + 1).length);
             if (overflow > 0) {
                 throw new Error(`${overflow} settings card(s) wider than the screen`);
             }
             await view(`${device}-2-settings`, small);
 
-            const help = await small.evaluate(() => [...document.querySelector('wc-side-bar').shadowRoot.querySelectorAll('a')]
-                .map((anchor) => anchor.href).find((href) => /pseditionbasic\/help/.test(href)));
+            const help = (await small.evaluate(menuEntries)).map((entry) => entry.href).find((href) => /pseditionbasic\/help/.test(href));
             if (!help) {
                 throw new Error('no Help Center entry in the menu');
             }
             await small.goto(help, { waitUntil: 'load' });
-            await small.waitForFunction(() => document.querySelectorAll('#vue-app a[href*="care-center.prestashop.com"]').length >= 5, null, { timeout: 30000 });
+            await small.waitForFunction(() => document.querySelectorAll('#peb-help a[href*="care-center.prestashop.com"]').length >= 5, null, { timeout: 30000 });
             const tooWide = await small.evaluate(() => document.documentElement.scrollWidth - innerWidth);
             if (tooWide > 1) {
                 throw new Error(`the help center scrolls sideways by ${tooWide}px`);

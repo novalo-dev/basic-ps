@@ -51,6 +51,8 @@ trait UseDisplayAdminNavBarBeforeEnd
             $smarty->assign('toggle_navigation_url', $this->context->link->getAdminLink('AdminEmployees', true, [], ['action' => 'toggleMenu']));
         }
 
+        $smarty->assign('peb_menu', \PrestaShop\Module\PsEditionBasic\Helper\SideBar::items($smarty->getTemplateVars('tabs_simplify')));
+
         return $this->display($this->_path, 'views/templates/admin/side-bar.tpl');
     }
 }

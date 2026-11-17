@@ -172,11 +172,6 @@ class ps_edition_basic extends Module
         return $this->getPathUri() . $relativePath . ($mtime ? '?v=' . $mtime : '');
     }
 
-    public function getParameter(string $key)// @phpstan-ignore-line
-    {
-        return $this->getContainer()->hasParameter($key) ? $this->getContainer()->getParameter($key) : null;
-    }
-
     private function getModulePath(string $name): string
     {
         return _PS_MODULE_DIR_ . $name . '/' . $name . '.php';

@@ -26,7 +26,10 @@ With the simplified menu on:
 
 Compared with the original module, it has no homepage, no setup guide, no PrestaShop
 Account or Billing dependency, no analytics and nothing loaded from another site.
-It never updates itself from PrestaShop Addons.
+It never updates itself from PrestaShop Addons. The menu, the breadcrumb, the settings
+page and the Help Center are drawn by the server with the class names of PrestaShop's
+design system, whose rules they use ship in `views/css`: no JavaScript app, only two
+small scripts that open sections and save the module switches.
 
 ## Getting a build
 
