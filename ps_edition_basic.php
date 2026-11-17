@@ -142,7 +142,7 @@ class ps_edition_basic extends Module
     private function addAdminThemeMedia(): void
     {
         $controller = $this->context->controller;
-        if (!$this->isPrestaShop8() || !$controller instanceof \AdminController) {
+        if (!$this->isPrestaShop8() || !$controller instanceof AdminController) {
             return;
         }
 
