@@ -6,3 +6,20 @@ services:
     class: PrestaShop\Module\PsEditionBasic\EventSubscriber\Ps9ThemeSubscriber
     tags:
       - { name: kernel.event_subscriber }
+
+  # PrestaShop 9 (Symfony 6.4) only hands its container to a controller declared
+  # as a service: autowiring calls the @required setContainer(). PrestaShop 8
+  # resolves the same controllers either way.
+  PrestaShop\Module\PsEditionBasic\Controller\AdminPsEditionBasicSettingsController:
+    class: PrestaShop\Module\PsEditionBasic\Controller\AdminPsEditionBasicSettingsController
+    autowire: true
+    autoconfigure: true
+    public: true
+    tags: ['controller.service_arguments']
+
+  PrestaShop\Module\PsEditionBasic\Controller\AdminPsEditionBasicCacheController:
+    class: PrestaShop\Module\PsEditionBasic\Controller\AdminPsEditionBasicCacheController
+    autowire: true
+    autoconfigure: true
+    public: true
+    tags: ['controller.service_arguments']

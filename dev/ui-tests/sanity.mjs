@@ -63,7 +63,9 @@ const check = async (name, run) => {
 };
 
 const open = async (url) => {
-    const response = await page.goto(url, { waitUntil: 'networkidle', timeout: 90000 });
+    // load, not networkidle: some PrestaShop modules' pages (Facebook & Instagram)
+    // keep calling outside services, and the network never goes quiet.
+    const response = await page.goto(url, { waitUntil: 'load', timeout: 90000 });
     if (!response || response.status() >= 400) {
         throw new Error(`answered ${response ? response.status() : 'nothing'}`);
     }
