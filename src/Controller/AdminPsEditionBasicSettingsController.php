@@ -27,6 +27,6 @@ class AdminPsEditionBasicSettingsController extends AdminPsEditionBasicControlle
 {
     protected function layoutTitle(): string
     {
-        return $this->trans('Settings', 'Modules.Editionbasic.Admin');
+        return $this->translate('Settings');
     }
 }

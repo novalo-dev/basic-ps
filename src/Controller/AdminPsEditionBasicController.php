@@ -41,9 +41,24 @@ class AdminPsEditionBasicController extends FrameworkBundleAdminController
         return SymfonyContainer::getInstance()->get($serviceName);
     }
 
+    /**
+     * The legacy context and the translator, read without PrestaShop's getContext()
+     * and trans(): both look in the controller's container, which on PrestaShop 8.2
+     * is a service locator without them once the controller is a service.
+     */
+    protected function legacyContext(): \Context
+    {
+        return \Context::getContext();
+    }
+
+    protected function translate(string $id): string
+    {
+        return $this->getService('translator')->trans($id, [], 'Modules.Editionbasic.Admin');
+    }
+
     protected function layoutTitle(): string
     {
-        return $this->trans('Home', 'Modules.Editionbasic.Admin');
+        return $this->translate('Home');
     }
 
     public function filter_settings_tabs_recursive(array $tabs, array $whitelist, array $blacklist = []): array
@@ -97,19 +112,19 @@ class AdminPsEditionBasicController extends FrameworkBundleAdminController
 
     public function indexAction(): Response
     {
-        if (intval($this->getContext()->employee->id_profile) !== 1) {
-            \Tools::redirectAdmin($this->getContext()->link->getAdminLink('AdminDashboard'));
+        if (intval($this->legacyContext()->employee->id_profile) !== 1) {
+            \Tools::redirectAdmin($this->legacyContext()->link->getAdminLink('AdminDashboard'));
         }
         $modulePsEditionBasic = $this->getService('ps_edition_basic.module');
 
         $jsLink = $modulePsEditionBasic->getAssetUrl((string) $modulePsEditionBasic->getParameter('ps_edition_basic.edition_basic_homepage_js'));
 
-        $tabs = \PrestaShop\Module\PsEditionBasic\Helper\MenuTabs::fromDatabase($this->getContext());
+        $tabs = \PrestaShop\Module\PsEditionBasic\Helper\MenuTabs::fromDatabase($this->legacyContext());
 
         /**
          * @var string|string[]
          */
-        $shopCountry = $this->getContext()->country->iso_code;
+        $shopCountry = $this->legacyContext()->country->iso_code;
         if (is_array($shopCountry)) { // Country might be an array
             $shopCountry = $shopCountry[array_key_first($shopCountry)] ?? '';
         }
@@ -134,7 +149,7 @@ class AdminPsEditionBasicController extends FrameworkBundleAdminController
                 'tabs' => \PrestaShop\Module\PsEditionBasic\Helper\MenuTabs::withoutHiddenPages(
                     $this->filter_settings_tabs_recursive($tabs, \PrestaShop\Module\PsEditionBasic\Config\Lists::settings(), \PrestaShop\Module\PsEditionBasic\Config\Lists::settingsExcluded())
                 ),
-                'locale' => $this->getContext()->language->iso_code,
+                'locale' => $this->legacyContext()->language->iso_code,
                 'shopCountry' => $shopCountry,
                 // Module entries are listed in the simplified menu instead.
                 'modulesTabs' => [],
