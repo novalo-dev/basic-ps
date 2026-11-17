@@ -45,11 +45,15 @@ class AdminPsEditionBasicSettingsController extends AdminPsEditionBasicControlle
     protected function pageVariables(): array
     {
         $tabs = MenuTabs::fromDatabase($this->legacyContext());
+        $menuModules = $this->menuModuleCards($tabs);
+        $menuOrder = 0;
+        $cards = self::arrange($this->settingsCards($tabs), $menuModules !== [], $menuOrder);
 
         return [
             'texts' => [
                 'title' => $this->translate('Configuration'),
                 'description' => $this->translate('Configure your shop in a few clicks'),
+                'modulesTitle' => $this->translate('Modules'),
                 'modulesDescription' => $this->translate('Choose the module pages shown in the menu.'),
                 'switch' => $this->translate('Show in the menu'),
                 'error' => $this->translate('The change could not be saved. Reload the page and try again.'),
@@ -57,8 +61,9 @@ class AdminPsEditionBasicSettingsController extends AdminPsEditionBasicControlle
                 'yes' => $this->getService('translator')->trans('Yes', [], 'Admin.Global'),
                 'no' => $this->getService('translator')->trans('No', [], 'Admin.Global'),
             ],
-            'cards' => $this->settingsCards($tabs),
-            'menuModules' => $this->menuModuleCards($tabs),
+            'cards' => $cards,
+            'menuModules' => $menuModules,
+            'menuOrder' => $menuOrder,
             'menuModulesUrl' => $this->getService('router')->generate('ps_edition_basic_menu_module'),
         ];
     }
@@ -105,16 +110,67 @@ class AdminPsEditionBasicSettingsController extends AdminPsEditionBasicControlle
             ];
         }
 
-        // The section with the most pages spans two columns: its description and
-        // the row it sits in read better wide than squeezed into one.
-        $widest = null;
+        // The two sections with the most pages span two columns each; arrange()
+        // places them so that every row is full.
+        $counts = array_map(static function (array $card): int {
+            return count($card['links']);
+        }, $cards);
+        arsort($counts);
+        $wide = array_slice(array_keys($counts), 0, 2);
         foreach ($cards as $index => $card) {
-            if ($widest === null || count($card['links']) > count($cards[$widest]['links'])) {
-                $widest = $index;
+            $cards[$index]['wide'] = in_array($index, $wide, true);
+        }
+
+        return $cards;
+    }
+
+    /**
+     * The place of each card in the three-column grid, so that each wide card
+     * shares its row with a narrow one instead of leaving a hole beside it.
+     *
+     * Full rows of narrow cards come first, then a row per wide card with one
+     * narrow card, alternately after and before it, then what is left. Both
+     * kinds keep their order; the module pages card, when there is one, is the
+     * last narrow card.
+     *
+     * @param array<int, array<string, mixed>> $cards
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function arrange(array $cards, bool $withMenu, int &$menuOrder): array
+    {
+        $narrow = [];
+        $wide = [];
+        foreach ($cards as $index => $card) {
+            if ($card['wide']) {
+                $wide[] = $index;
+            } else {
+                $narrow[] = $index;
             }
         }
-        foreach ($cards as $index => $card) {
-            $cards[$index]['wide'] = $index === $widest;
+        if ($withMenu) {
+            $narrow[] = 'menu';
+        }
+
+        $fullRows = intdiv(max(0, count($narrow) - count($wide)), 3);
+        $sequence = array_splice($narrow, 0, $fullRows * 3);
+        foreach ($wide as $i => $index) {
+            $partner = array_shift($narrow);
+            $row = $i % 2 === 0 ? [$partner, $index] : [$index, $partner];
+            foreach ($row as $item) {
+                if ($item !== null) {
+                    $sequence[] = $item;
+                }
+            }
+        }
+        $sequence = array_merge($sequence, $narrow);
+
+        foreach ($sequence as $order => $item) {
+            if ($item === 'menu') {
+                $menuOrder = $order;
+            } else {
+                $cards[$item]['order'] = $order;
+            }
         }
 
         return $cards;

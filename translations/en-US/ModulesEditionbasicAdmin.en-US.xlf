@@ -17,6 +17,11 @@
         <target state="translated">Configure your shop in a few clicks</target>
         <note>Line: </note>
       </trans-unit>
+      <trans-unit id="bf17ac149e2e7a530c677e9bd51d3fd2">
+        <source>Modules</source>
+        <target state="translated">Modules</target>
+        <note>Line: </note>
+      </trans-unit>
       <trans-unit id="6ed87c3e5573bcbf7ea8026c07273b44">
         <source>Choose the module pages shown in the menu.</source>
         <target state="translated">Choose the module pages shown in the menu.</target>

@@ -36,9 +36,9 @@
             <p class="text-muted mb-0" data-peb-description>{{ texts.description }}</p>
         </div>
 
-        <div class="row" data-peb-view="home">
+        <div class="row peb-settings__grid" data-peb-view="home">
             {% for card in cards %}
-                <div class="{{ card.wide ? 'col-lg-8' : 'col-lg-4' }} mb-4">
+                <div class="{{ card.wide ? 'col-lg-8 peb-settings__wide' : 'col-lg-4' }} mb-4" style="order: {{ card.order }}">
                     <div class="card h-100 mb-0 peb-settings__card">
                         <div class="card-body d-flex align-items-center">
                             {{ _self.icon(card.icon) }}
@@ -53,12 +53,12 @@
                 </div>
             {% endfor %}
             {% if menuModules is not empty %}
-                <div class="col-lg-4 mb-4">
+                <div class="col-lg-4 mb-4" style="order: {{ menuOrder }}">
                     <div class="card h-100 mb-0 peb-settings__card">
                         <div class="card-body d-flex align-items-center">
                             {{ _self.icon('menu') }}
                             <div class="peb-settings__text">
-                                <a href="#modules" class="stretched-link text-reset font-weight-bold peb-settings__name" data-peb-open="modules">{{ texts.switch }}</a>
+                                <a href="#modules" class="stretched-link text-reset font-weight-bold peb-settings__name" data-peb-open="modules">{{ texts.modulesTitle }}</a>
                                 <div class="text-muted small mt-1">{{ texts.modulesDescription }}</div>
                             </div>
                             <i class="material-icons text-muted ml-3" aria-hidden="true">chevron_right</i>
@@ -87,7 +87,7 @@
         {% endfor %}
 
         {% if menuModules is not empty %}
-            <div id="peb-menu-modules" class="row" data-peb-view="modules" data-title="{{ texts.switch }}" data-description="{{ texts.modulesDescription }}"
+            <div id="peb-menu-modules" class="row" data-peb-view="modules" data-title="{{ texts.modulesTitle }}" data-description="{{ texts.modulesDescription }}"
                  data-url="{{ menuModulesUrl }}" data-error="{{ texts.error }}" hidden>
                 {% for card in menuModules %}
                     <div class="col-lg-4 mb-4">

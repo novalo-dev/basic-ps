@@ -237,6 +237,26 @@
   display: none !important;
 }
 
+/* On a wide screen the sections are a three-column grid; the server gives each
+   card its place (order) so the two wide ones each share a row with a narrow one. */
+@media (min-width: 992px) {
+  .peb-settings .peb-settings__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 30px;
+    margin: 0;
+  }
+
+  .peb-settings .peb-settings__grid > * {
+    max-width: none;
+    padding: 0;
+  }
+
+  .peb-settings .peb-settings__grid > .peb-settings__wide {
+    grid-column: span 2;
+  }
+}
+
 /* The circle holds the glyph, so the glyph keeps the width of one icon. */
 .peb-settings__icon {
   display: inline-flex;
