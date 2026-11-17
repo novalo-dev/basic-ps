@@ -115,9 +115,11 @@ jobs:
 
       # The module catalogue shops run on PrestaShop 8.0.2 and up: its window of
       # recommended modules is one of the screens other modules draw in the back
-      # office, and has to hold up under the PrestaShop 9 look.
+      # office, and has to hold up under the PrestaShop 9 look. Checkout also
+      # asks for it: without it, its page stops at a screen asking to authorize
+      # its installation, and its own page is never drawn.
       - name: PrestaShop's module catalogue
-        if: matrix.prestashop == '8.2'
+        if: matrix.major == '8'
         run: |
           git clone --quiet --depth 1 --branch v4.14.3 https://github.com/PrestaShopCorp/ps_mbo.git "$RUNNER_TEMP/ps_mbo"
           composer install --working-dir="$RUNNER_TEMP/ps_mbo" --no-dev --no-interaction --no-progress --ignore-platform-reqs
@@ -129,7 +131,7 @@ jobs:
       # bootstrap frame, with an app of its own: the page every shop with
       # Checkout opens, and the one the PrestaShop 9 look has to hold up on.
       # Release builds, which carry their dependencies; its app needs
-      # PrestaShop Account installed to show.
+      # PrestaShop Account and the module catalogue installed to show.
       - name: PrestaShop Checkout
         if: matrix.major == '8'
         run: |

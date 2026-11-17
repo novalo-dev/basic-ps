@@ -177,6 +177,56 @@ const overlaps = (scope) => page.evaluate((selector) => {
 }, scope);
 
 // What the module must have done to the page in front of the browser.
+// Every box of the page that scrolls on its own, with its size and the style
+// rules that set its height or its overflow: enough to aim one rule at it.
+const scrollingBoxes = () => {
+    const name = (element) => `${element.tagName.toLowerCase()}${element.id ? '#' + element.id : ''}${[...element.classList].slice(0, 3).map((c) => '.' + c).join('')}`;
+    const rules = (element) => {
+        const found = [];
+        for (const sheet of document.styleSheets) {
+            let list;
+            try {
+                list = sheet.cssRules;
+            } catch (error) {
+                continue;
+            }
+            for (const rule of list || []) {
+                try {
+                    if (rule.selectorText && element.matches(rule.selectorText) && /height|overflow/.test(rule.style.cssText)) {
+                        found.push(`${rule.selectorText} { ${rule.style.cssText} } (${(sheet.href || 'inline').split('/').pop()})`);
+                    }
+                } catch (error) {
+                    // A selector this browser cannot read.
+                }
+            }
+        }
+        return found.slice(0, 6);
+    };
+    return JSON.stringify([...document.querySelectorAll('#main *')]
+        .filter((element) => {
+            const style = getComputedStyle(element);
+            return element.getBoundingClientRect().height > 0 && /(auto|scroll)/.test(style.overflowY) && element.scrollHeight > element.clientHeight + 1;
+        })
+        .slice(0, 5)
+        .map((element) => {
+            const chain = [];
+            for (let node = element; node && node.id !== 'main' && chain.length < 6; node = node.parentElement) {
+                chain.unshift(name(node));
+            }
+            const style = getComputedStyle(element);
+            return {
+                box: chain.join(' > '),
+                client: element.clientHeight,
+                scroll: element.scrollHeight,
+                height: style.height,
+                maxHeight: style.maxHeight,
+                overflowY: style.overflowY,
+                inline: element.getAttribute('style') || '',
+                rules: rules(element),
+            };
+        }));
+};
+
 const lookChecks = async () => {
     const state = await page.evaluate(() => {
         const sheets = [...document.querySelectorAll('link[rel="stylesheet"]')].map((link) => link.getAttribute('href') || '');
@@ -432,6 +482,23 @@ if (signedIn) {
                 }
                 await lookChecks();
             });
+            // On a short window, as on a laptop, Checkout's app had a box of its
+            // own that scrolled inside the page. What scrolls is written to the
+            // log with the height rules that reach it, then the usual checks
+            // run at that size.
+            if (name === 'ps_checkout') {
+                await check('module ps_checkout, short window', async () => {
+                    await page.setViewportSize({ width: 1220, height: 490 });
+                    try {
+                        await page.waitForTimeout(1500);
+                        await view('8-checkout-short');
+                        console.log(`CHECKOUT ${await page.evaluate(scrollingBoxes)}`);
+                        await lookChecks();
+                    } finally {
+                        await page.setViewportSize({ width: 1400, height: 900 });
+                    }
+                });
+            }
         }
     }
 
