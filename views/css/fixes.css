@@ -128,3 +128,10 @@ body:not(.display-modal) #content.bootstrap.with-tabs {
 .btn-outline-primary.card-currency-reset:active {
   background-color: var(--cdk-primary-400, #ddd);
 }
+
+/* On a phone or a tablet, PrestaShop 8 hooks perfect-scrollbar onto the menu,
+   which briefly draws a horizontal bar while the menu slides in. The menu never
+   scrolls sideways, so that bar has nothing to show. */
+.nav-bar-overflow > .ps__rail-x {
+  display: none !important;
+}

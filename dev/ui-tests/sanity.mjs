@@ -11,7 +11,7 @@
  * Usage: node sanity.mjs <admin url> <email> <password> <browser> <shot dir> <PrestaShop major> [results file]
  */
 import { appendFileSync, mkdirSync } from 'node:fs';
-import { chromium, firefox } from 'playwright';
+import { chromium, devices, firefox } from 'playwright';
 
 const [adminUrl, email, password, browserName = 'chromium', shots = 'ui-shots', major = '8', results = ''] = process.argv.slice(2);
 if (!adminUrl || !email || !password) {
@@ -65,10 +65,10 @@ const check = async (name, run) => {
 // Views of the back office kept with the run, to look at the result rather than
 // only read it. On a manual run they are also written to
 // the log, which can be read where the run's files cannot be downloaded.
-const view = async (name) => {
-    await page.waitForTimeout(1500);
+const view = async (name, on = page) => {
+    await on.waitForTimeout(1500);
     const file = `${shots}/view-${name}.jpg`;
-    const image = await page.screenshot({ path: file, type: 'jpeg', quality: 80 });
+    const image = await on.screenshot({ path: file, type: 'jpeg', quality: 80 });
     if (process.env.PRINT_VIEWS === '1') {
         const data = image.toString('base64');
         for (let i = 0; i < data.length; i += 4000) {
@@ -268,6 +268,63 @@ if (signedIn) {
         await page.waitForFunction(() => !document.getElementById('peb-menu-modules').hidden, null, { timeout: 30000 });
         await view('5-module-switched-on');
     });
+}
+
+// The same back office on a phone and a tablet: the login page, the menu opened
+// from its button, and the settings page with the module cards. Chromium only,
+// which is the browser that emulates touch devices.
+if (signedIn && browserName === 'chromium') {
+    for (const [device, profile] of [['phone', devices['iPhone 13']], ['tablet', devices['iPad (gen 7)']]]) {
+        const context = await browser.newContext({ ...profile });
+        const small = await context.newPage();
+        await check(`${device}: login, menu and settings page`, async () => {
+            await small.goto(adminUrl, { waitUntil: 'load' });
+            await view(`${device}-0-login`, small);
+            await small.locator('input[type="email"]').first().fill(email);
+            await small.locator('input[type="password"]').first().fill(password);
+            await Promise.all([
+                small.waitForLoadState('load'),
+                small.locator('form:has(input[type="password"]) button[type="submit"]').first().click(),
+            ]);
+            await small.waitForFunction(() => document.querySelector('wc-side-bar')?.shadowRoot?.querySelectorAll('a').length > 5, null, { timeout: 30000 });
+
+            const wide = await small.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+            if (wide > 1) {
+                throw new Error(`the page scrolls sideways by ${wide}px`);
+            }
+
+            // The button only works once PrestaShop's scripts have bound it, after load.
+            const menuIsOpen = () => small.evaluate(() => {
+                const menu = document.querySelector('.nav-bar');
+                return menu.classList.contains('expanded') && menu.getBoundingClientRect().left >= 0;
+            });
+            for (let attempt = 0; attempt < 10 && !await menuIsOpen(); ++attempt) {
+                await small.waitForTimeout(1000);
+                if (!await menuIsOpen()) {
+                    await small.locator('.js-mobile-menu').first().click();
+                }
+            }
+            await view(`${device}-1-menu-open`, small);
+            if (!await menuIsOpen()) {
+                throw new Error('the menu does not open from its button');
+            }
+
+            const settings = await small.evaluate(() => [...document.querySelector('wc-side-bar').shadowRoot.querySelectorAll('a')]
+                .map((anchor) => anchor.href).find((href) => /pseditionbasic\/settings/.test(href)));
+            if (!settings) {
+                throw new Error('no Settings entry in the menu');
+            }
+            await small.goto(settings, { waitUntil: 'load' });
+            await small.waitForFunction(() => document.querySelectorAll('#vue-app a[href]').length >= 7, null, { timeout: 30000 });
+            const overflow = await small.evaluate(() => [...document.querySelectorAll('#vue-app .puik-card')]
+                .filter((card) => card.getBoundingClientRect().right > innerWidth + 1).length);
+            if (overflow > 0) {
+                throw new Error(`${overflow} settings card(s) wider than the screen`);
+            }
+            await view(`${device}-2-settings`, small);
+        });
+        await context.close();
+    }
 }
 
 await browser.close();
