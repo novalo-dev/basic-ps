@@ -117,9 +117,10 @@ jobs:
       # recommended modules is one of the screens other modules draw in the back
       # office, and has to hold up under the PrestaShop 9 look. Checkout also
       # asks for it: without it, its page stops at a screen asking to authorize
-      # its installation, and its own page is never drawn.
+      # its installation, and its own page is never drawn. The catalogue does
+      # not install on 8.0.0, where Checkout shows that screen only.
       - name: PrestaShop's module catalogue
-        if: matrix.major == '8'
+        if: matrix.prestashop == '8.2'
         run: |
           git clone --quiet --depth 1 --branch v4.14.3 https://github.com/PrestaShopCorp/ps_mbo.git "$RUNNER_TEMP/ps_mbo"
           composer install --working-dir="$RUNNER_TEMP/ps_mbo" --no-dev --no-interaction --no-progress --ignore-platform-reqs

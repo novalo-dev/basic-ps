@@ -202,15 +202,28 @@ const scrollingBoxes = () => {
         }
         return found.slice(0, 6);
     };
-    return JSON.stringify([...document.querySelectorAll('#main *')]
+    // Apps such as Checkout's draw inside shadow roots, which querySelectorAll
+    // does not enter; the page itself is looked at too, from the root down.
+    const all = [];
+    const walk = (root) => {
+        for (const element of root.querySelectorAll('*')) {
+            all.push(element);
+            if (element.shadowRoot) {
+                walk(element.shadowRoot);
+            }
+        }
+    };
+    walk(document);
+    return JSON.stringify([...all]
         .filter((element) => {
             const style = getComputedStyle(element);
-            return element.getBoundingClientRect().height > 0 && /(auto|scroll)/.test(style.overflowY) && element.scrollHeight > element.clientHeight + 1;
+            return element.getBoundingClientRect().height > 0 && /(auto|scroll|hidden|clip)/.test(style.overflowY) && element.scrollHeight > element.clientHeight + 1;
         })
-        .slice(0, 5)
+        .sort((a, b) => b.scrollHeight - b.clientHeight - (a.scrollHeight - a.clientHeight))
+        .slice(0, 8)
         .map((element) => {
             const chain = [];
-            for (let node = element; node && node.id !== 'main' && chain.length < 6; node = node.parentElement) {
+            for (let node = element; node && chain.length < 6; node = node.parentElement || (node.getRootNode() && node.getRootNode().host)) {
                 chain.unshift(name(node));
             }
             const style = getComputedStyle(element);
@@ -493,6 +506,7 @@ if (signedIn) {
                         await page.waitForTimeout(1500);
                         await view('8-checkout-short');
                         console.log(`CHECKOUT ${await page.evaluate(scrollingBoxes)}`);
+                        console.log(`CHECKOUT frames ${page.frames().map((frame) => frame.url().slice(0, 100)).join(' | ')}`);
                         await lookChecks();
                     } finally {
                         await page.setViewportSize({ width: 1400, height: 900 });
