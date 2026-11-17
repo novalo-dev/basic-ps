@@ -131,9 +131,12 @@ const signedIn = await check('sign in to the back office', async () => {
 });
 
 if (signedIn) {
-    const links = await page.$$eval('.nav-bar a', (anchors) => [...new Map(anchors
-        .filter((anchor) => anchor.href && anchor.href.includes('index.php'))
-        .map((anchor) => [anchor.href, (anchor.textContent || '').trim().replace(/\s+/g, ' ')])).entries()]);
+    // Every back office page of the menu: PrestaShop 9 drops index.php from its
+    // URLs, so a link is kept for pointing inside the back office folder.
+    const adminRoot = new URL('.', adminUrl).toString();
+    const links = await page.$$eval('.nav-bar a', (anchors, root) => [...new Map(anchors
+        .filter((anchor) => anchor.href.startsWith(root) && !/logout|AdminLogin/i.test(anchor.href))
+        .map((anchor) => [anchor.href, (anchor.textContent || '').trim().replace(/\s+/g, ' ')])).entries()], adminRoot);
     console.log(`${links.length} menu pages`);
 
     for (const [href, label] of links) {
@@ -158,7 +161,10 @@ if (signedIn) {
             configure.searchParams.set('configure', 'ps_edition_basic');
         }
         await open(configure.toString());
-        await page.locator('#SMB_IS_NEW_MENU_ENABLED_on').check({ force: true });
+        // The switch draws its own toggle over the radio, which a click on the
+        // hidden input does not reach on every theme build: the radio is set
+        // directly, and the form itself is submitted as a merchant would.
+        await page.locator('#SMB_IS_NEW_MENU_ENABLED_on').evaluate((radio) => { radio.checked = true; });
         await Promise.all([
             page.waitForLoadState('load'),
             page.locator('button[name="submitSmbConfiguration"]').click(),
