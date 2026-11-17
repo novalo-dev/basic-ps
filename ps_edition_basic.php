@@ -43,7 +43,7 @@ class ps_edition_basic extends Module
     public function __construct()
     {
         $this->name = 'ps_edition_basic';
-        $this->version = '1.2.18';
+        $this->version = '1.2.19';
         $this->tab = 'administration';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;

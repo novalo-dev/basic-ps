@@ -216,7 +216,8 @@ class AdminPsEditionBasicSettingsController extends AdminPsEditionBasicControlle
      */
     public function toggleMenuModuleAction(Request $request): JsonResponse
     {
-        if ((int) $this->legacyContext()->employee->id_profile !== 1) {
+        // Changing the menu is editing the settings page: its Edit permission.
+        if (!$this->granted('edit')) {
             return new JsonResponse(['saved' => false], Response::HTTP_FORBIDDEN);
         }
 

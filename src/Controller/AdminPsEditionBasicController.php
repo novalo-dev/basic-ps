@@ -74,9 +74,30 @@ abstract class AdminPsEditionBasicController extends FrameworkBundleAdminControl
         return (string) $this->getService('ps_edition_basic.module')->getAssetUrl($path);
     }
 
+    /**
+     * Whether the employee's profile holds this right on the page's own tab, as set
+     * in Team > Permissions: the page answers to PrestaShop's permissions, like
+     * the menu that links to it, and not to a profile named in the code.
+     *
+     * @param string $right view, add, edit or delete
+     */
+    protected function granted(string $right): bool
+    {
+        $idProfile = (int) $this->legacyContext()->employee->id_profile;
+        // As Tab::checkTabRights(): the SuperAdmin profile holds every right.
+        if ($idProfile === (int) _PS_ADMIN_PROFILE_) {
+            return true;
+        }
+        // Each page is the tab of the same name, installed by Tabs::getTabs().
+        $idTab = (int) \Tab::getIdFromClassName((new \ReflectionClass($this))->getShortName());
+        $accesses = \Profile::getProfileAccesses($idProfile);
+
+        return isset($accesses[$idTab][$right]) && (string) $accesses[$idTab][$right] === '1';
+    }
+
     public function indexAction(): Response
     {
-        if (intval($this->legacyContext()->employee->id_profile) !== 1) {
+        if (!$this->granted('view')) {
             \Tools::redirectAdmin($this->legacyContext()->link->getAdminLink('AdminDashboard'));
         }
 
