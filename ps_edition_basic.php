@@ -43,7 +43,7 @@ class ps_edition_basic extends Module
     public function __construct()
     {
         $this->name = 'ps_edition_basic';
-        $this->version = '1.1.2';
+        $this->version = '1.1.3';
         $this->tab = 'administration';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
@@ -117,6 +117,7 @@ class ps_edition_basic extends Module
     public function uninstall(): bool
     {
         Configuration::deleteByName('SMB_IS_NEW_MENU_ENABLED');
+        Configuration::deleteByName(PrestaShop\Module\PsEditionBasic\Config\MenuModules::CONFIGURATION_KEY);
 
         return parent::uninstall()
             && (new Uninstall($this->name))->run();

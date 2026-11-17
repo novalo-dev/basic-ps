@@ -157,6 +157,26 @@
         <target state="translated">Impostazioni aggiornate</target>
         <note>Line: </note>
       </trans-unit>
+      <trans-unit id="bf17ac149e2e7a530c677e9bd51d3fd2">
+        <source>Modules</source>
+        <target state="translated">Moduli</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="6ed87c3e5573bcbf7ea8026c07273b44">
+        <source>Choose the module pages shown in the menu.</source>
+        <target state="translated">Scegli le pagine dei moduli mostrate nel menu.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="691323e4f2d181a71c65f9f058f89824">
+        <source>Show in the menu</source>
+        <target state="translated">Mostra nel menu</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="3f2c99705fae218861fdd88c1c620eea">
+        <source>The change could not be saved. Reload the page and try again.</source>
+        <target state="translated">Impossibile salvare la modifica. Ricarica la pagina e riprova.</target>
+        <note>Line: </note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -23,8 +23,13 @@ declare(strict_types=1);
 
 namespace PrestaShop\Module\PsEditionBasic\Controller;
 
+use PrestaShop\Module\PsEditionBasic\Config\Lists;
+use PrestaShop\Module\PsEditionBasic\Config\MenuModules;
+use PrestaShop\Module\PsEditionBasic\Helper\MenuTabs;
 use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class AdminPsEditionBasicController extends FrameworkBundleAdminController
@@ -110,6 +115,63 @@ class AdminPsEditionBasicController extends FrameworkBundleAdminController
         return $scheme . $_SERVER['HTTP_HOST'] . $router->generate($routeName);
     }
 
+    /**
+     * The module pages of the back office, as cards for the settings page, each
+     * with whether the merchant switched it on in the menu.
+     *
+     * @param array<int, array<string, mixed>> $tabs the whole back office menu
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function menuModuleCards(array $tabs): array
+    {
+        $shown = MenuModules::shown();
+        $cards = [];
+        foreach (MenuTabs::moduleEntries($tabs, Lists::placed()) as $tab) {
+            // The module's own description says what the page is for, as the
+            // configuration cards do; its name stands in when it has none.
+            $description = '';
+            $module = empty($tab['module']) ? null : \Module::getInstanceByName((string) $tab['module']);
+            if ($module) {
+                $description = (string) ($module->description ?: $module->displayName);
+            }
+
+            $cards[] = [
+                'class_name' => (string) $tab['class_name'],
+                'name' => (string) ($tab['name'] ?: $tab['class_name']),
+                'href' => (string) $tab['href'],
+                'icon' => (string) ($tab['icon'] ?: 'extension'),
+                'description' => $description,
+                'shown' => in_array($tab['class_name'], $shown, true),
+            ];
+        }
+
+        return $cards;
+    }
+
+    /**
+     * Saves the switch of one module card: the page shows in the menu or not.
+     */
+    public function toggleMenuModuleAction(Request $request): JsonResponse
+    {
+        if ((int) $this->legacyContext()->employee->id_profile !== 1) {
+            return new JsonResponse(['saved' => false], Response::HTTP_FORBIDDEN);
+        }
+
+        $className = (string) $request->request->get('class_name', '');
+        $shown = (bool) $request->request->get('shown', false);
+
+        // Only a module page the settings page lists can be stored.
+        $known = array_column($this->menuModuleCards(MenuTabs::fromDatabase($this->legacyContext())), 'class_name');
+        if (!in_array($className, $known, true)) {
+            return new JsonResponse(['saved' => false], Response::HTTP_BAD_REQUEST);
+        }
+
+        MenuModules::set($className, $shown);
+
+        return new JsonResponse(['saved' => true, 'shown' => $shown]);
+    }
+
     public function indexAction(): Response
     {
         if (intval($this->legacyContext()->employee->id_profile) !== 1) {
@@ -119,7 +181,7 @@ class AdminPsEditionBasicController extends FrameworkBundleAdminController
 
         $jsLink = $modulePsEditionBasic->getAssetUrl((string) $modulePsEditionBasic->getParameter('ps_edition_basic.edition_basic_homepage_js'));
 
-        $tabs = \PrestaShop\Module\PsEditionBasic\Helper\MenuTabs::fromDatabase($this->legacyContext());
+        $tabs = MenuTabs::fromDatabase($this->legacyContext());
 
         /**
          * @var string|string[]
@@ -136,6 +198,18 @@ class AdminPsEditionBasicController extends FrameworkBundleAdminController
             'layoutTitle' => $this->layoutTitle(),
             'enableSidebar' => true,
             'jsLink' => $jsLink,
+            'menuModules' => $this->menuModuleCards($tabs),
+            'menuModulesTexts' => [
+                'title' => $this->translate('Modules'),
+                'description' => $this->translate('Choose the module pages shown in the menu.'),
+                'switch' => $this->translate('Show in the menu'),
+                'error' => $this->translate('The change could not be saved. Reload the page and try again.'),
+            ],
+            'menuModulesUrl' => $this->getService('router')->generate('ps_edition_basic_menu_module'),
+            'menuModulesAssets' => [
+                'css' => $modulePsEditionBasic->getAssetUrl('views/css/menu-modules.css'),
+                'js' => $modulePsEditionBasic->getAssetUrl('views/js/menu-modules.js'),
+            ],
             'jsContext' => json_encode([
                 'CACHE_CLEAR_API_URL' => $cacheClearApiUrl,
                 'moduleName' => $modulePsEditionBasic->displayName,
@@ -146,12 +220,13 @@ class AdminPsEditionBasicController extends FrameworkBundleAdminController
                 'moduleUpdateLink' => '',
                 'shopName' => (string) \Configuration::get('PS_SHOP_NAME'),
                 'isShopEnabled' => (bool) \Configuration::get('PS_SHOP_ENABLE'),
-                'tabs' => \PrestaShop\Module\PsEditionBasic\Helper\MenuTabs::withoutHiddenPages(
-                    $this->filter_settings_tabs_recursive($tabs, \PrestaShop\Module\PsEditionBasic\Config\Lists::settings(), \PrestaShop\Module\PsEditionBasic\Config\Lists::settingsExcluded())
+                'tabs' => MenuTabs::withoutHiddenPages(
+                    $this->filter_settings_tabs_recursive($tabs, Lists::settings(), Lists::settingsExcluded())
                 ),
                 'locale' => $this->legacyContext()->language->iso_code,
                 'shopCountry' => $shopCountry,
-                // Module entries are listed in the simplified menu instead.
+                // Module pages get their own section with a menu switch, drawn by
+                // the template rather than by this app, which has no switch.
                 'modulesTabs' => [],
             ]),
         ]);

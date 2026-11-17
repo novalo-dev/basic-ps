@@ -230,6 +230,37 @@ if (signedIn) {
         await view('4-settings-page');
         await lookChecks();
     });
+
+    // Module pages are off the menu until switched on from their settings card.
+    await check('a module page switched on shows in the menu', async () => {
+        const cards = page.locator('#peb-menu-modules [data-class-name]');
+        await page.waitForFunction(() => {
+            const section = document.getElementById('peb-menu-modules');
+            return !section || (!section.hidden && section.closest('#vue-app'));
+        }, null, { timeout: 30000 });
+        if (await cards.count() === 0) {
+            console.log('no module page on this shop: nothing to switch');
+            return;
+        }
+        const card = cards.first();
+        const name = (await card.locator('h1').innerText()).trim();
+        // An entry with sub-pages also holds its arrow icon's name: matched by inclusion.
+        const inMenu = async () => page.evaluate((label) => [...document.querySelector('wc-side-bar').shadowRoot.querySelectorAll('a')]
+            .some((anchor) => anchor.textContent.replace(/\s+/g, ' ').includes(label)), name);
+        if (await inMenu()) {
+            throw new Error(`${name} is in the menu before its switch is on`);
+        }
+        const toggle = card.locator('[role="switch"]');
+        await toggle.click();
+        await page.waitForFunction((el) => el.getAttribute('aria-checked') === 'true' && !el.hasAttribute('aria-busy'), await toggle.elementHandle(), { timeout: 30000 });
+        await page.reload({ waitUntil: 'load' });
+        await page.waitForFunction(() => document.querySelector('wc-side-bar')?.shadowRoot?.querySelectorAll('a').length > 5, null, { timeout: 30000 });
+        if (!await inMenu()) {
+            throw new Error(`${name} is not in the menu once switched on`);
+        }
+        await page.waitForFunction(() => !document.getElementById('peb-menu-modules').hidden, null, { timeout: 30000 });
+        await view('5-module-switched-on');
+    });
 }
 
 await browser.close();

@@ -14,8 +14,11 @@
 
 With the simplified menu on:
 
-- the menu keeps the dashboard and the selling sections;
-- entries added by modules are grouped above *Settings*, between two separators;
+- the menu keeps the dashboard, *Care Center* just under it, and the selling sections;
+- module pages are listed as cards on the settings page, each with a switch: a page
+  switched on joins the menu, grouped above *Settings* between two separators (all
+  are off at first);
+- *Wall of Fame* stays at the very end of the menu, below *Settings*;
 - *Modules*, *Design*, shipping, payment, international and both parameter sections
   become cards on the settings page.
 

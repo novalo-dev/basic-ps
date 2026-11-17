@@ -48,6 +48,28 @@ class Lists
     }
 
     /**
+     * Module pages pinned to the very end of the menu, below the settings entry,
+     * whatever the merchant chose on the settings page: the Wall of Fame.
+     *
+     * @return string[]
+     */
+    public static function menuBottom(): array
+    {
+        return self::load('menuBottomList.json');
+    }
+
+    /**
+     * Every page the menu or the settings page already places: what is left are
+     * the module pages the merchant chooses to show in the menu or not.
+     *
+     * @return string[]
+     */
+    public static function placed(): array
+    {
+        return array_merge(self::settings(), self::menu(), self::menuBottom());
+    }
+
+    /**
      * Sub-pages of the advanced parameters card left out by name.
      *
      * @return string[]

@@ -48,15 +48,19 @@ trait UseActionAdminMenuTabsModifier
     {
         $modules = [];
         if (in_array('SELL', array_column($navItems, 'class_name'))) {
-            $modules = \PrestaShop\Module\PsEditionBasic\Helper\MenuTabs::moduleEntries(
-                $navItems,
-                array_merge(\PrestaShop\Module\PsEditionBasic\Config\Lists::settings(), \PrestaShop\Module\PsEditionBasic\Config\Lists::menu())
-            );
+            // Only the module pages the merchant switched on from the settings page.
+            $shown = \PrestaShop\Module\PsEditionBasic\Config\MenuModules::shown();
+            $modules = array_values(array_filter(
+                \PrestaShop\Module\PsEditionBasic\Helper\MenuTabs::moduleEntries($navItems, \PrestaShop\Module\PsEditionBasic\Config\Lists::placed()),
+                function (array $tab) use ($shown): bool {
+                    return in_array($tab['class_name'], $shown, true);
+                }
+            ));
             $navItems = $this->flatSecondLevelRemovingFirstLevel($navItems);
         }
 
-        // The settings entry closes the menu; the entries modules add sit just above
-        // it, as their own group under a separator, instead of on the settings page.
+        // The settings entry closes the main list; the module pages the merchant
+        // chose sit just above it, as their own group under a separator.
         $main = [];
         $settings = [];
         foreach ($this->pickTabs($navItems, \PrestaShop\Module\PsEditionBasic\Config\Lists::menu()) as $tab) {
@@ -74,7 +78,16 @@ trait UseActionAdminMenuTabsModifier
             }
         }
 
-        return \PrestaShop\Module\PsEditionBasic\Helper\MenuTabs::withoutHiddenPages(array_merge($main, $modules, $settings));
+        // Pinned below the settings entry, at the very end, under its own separator.
+        $bottom = $this->pickTabs($navItems, \PrestaShop\Module\PsEditionBasic\Config\Lists::menuBottom());
+        foreach ($bottom as $index => $tab) {
+            $bottom[$index]['divider_before'] = $index === 0;
+            if (empty($tab['icon'])) {
+                $bottom[$index]['icon'] = 'extension';
+            }
+        }
+
+        return \PrestaShop\Module\PsEditionBasic\Helper\MenuTabs::withoutHiddenPages(array_merge($main, $modules, $settings, $bottom));
     }
 
     private function flatSecondLevelRemovingFirstLevel(array $tabs): array
@@ -99,12 +112,24 @@ trait UseActionAdminMenuTabsModifier
         return $result;
     }
 
+    /**
+     * The tabs of the list, in the order of the list rather than the menu's: an
+     * entry such as Care Center sits where the list puts it, wherever its module
+     * placed it in the native menu.
+     */
     private function pickTabs(array $tabs, array $whiteListTabs): array
     {
-        $result = [];
+        $byClassName = [];
         foreach ($tabs as $tab) {
-            if (in_array($tab['class_name'], $whiteListTabs)) {
-                $result[] = $tab;
+            if (in_array($tab['class_name'], $whiteListTabs, true) && !isset($byClassName[$tab['class_name']])) {
+                $byClassName[$tab['class_name']] = $tab;
+            }
+        }
+
+        $result = [];
+        foreach ($whiteListTabs as $className) {
+            if (isset($byClassName[$className])) {
+                $result[] = $byClassName[$className];
             }
         }
 

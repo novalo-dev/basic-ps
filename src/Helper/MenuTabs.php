@@ -43,8 +43,11 @@ class MenuTabs
         $result = [];
 
         foreach (\Tab::getTabs((int) $context->language->id, $parentId) as $tab) {
+            // PrestaShop 8 also hides the legacy stock page while advanced stock
+            // management is off; PrestaShop 9 no longer has that page.
             if (!\Tab::checkTabRights((int) $tab['id_tab'])
                 || !$tab['enabled']
+                || ($tab['class_name'] === 'AdminStock' && !\Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT'))
                 || $tab['class_name'] === 'AdminCarrierWizard') {
                 continue;
             }

@@ -1,0 +1,59 @@
+/**
+ * The switch of the module cards on the settings page, drawn like the switches
+ * of the settings app (its own are scoped to the app's components).
+ */
+/* Not a utility class: the app's utilities are !important and would show the
+   section before it has moved under the cards. */
+#peb-menu-modules:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+#peb-menu-modules .peb-menu-modules__link {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+#peb-menu-modules .peb-switch {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  width: 2.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  background-color: #1d1d1b;
+  cursor: pointer;
+  transition: background-color .2s cubic-bezier(.4, 0, .2, 1);
+}
+
+#peb-menu-modules .peb-switch[aria-checked="true"] {
+  background-color: #207f4b;
+}
+
+#peb-menu-modules .peb-switch:focus-visible {
+  outline: 2px solid #174eef;
+  outline-offset: 2px;
+}
+
+#peb-menu-modules .peb-switch[aria-busy="true"] {
+  opacity: .6;
+  pointer-events: none;
+}
+
+#peb-menu-modules .peb-switch__toggle {
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  background-color: #fff;
+  transform: translateX(.125rem);
+  transition: transform .2s cubic-bezier(.4, 0, .2, 1);
+}
+
+#peb-menu-modules .peb-switch[aria-checked="true"] .peb-switch__toggle {
+  transform: translateX(1.125rem);
+}

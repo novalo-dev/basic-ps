@@ -50,6 +50,7 @@ foreach ($catalogues as $domain => $locales) {
 }
 
 // trans('text', [...], 'Modules.Editionbasic.X') and the controllers' trans('text', 'domain')
+// or translate('text')
 $pattern = '/->trans\(\s*([\'"])((?:\\\\.|(?!\1).)*)\1\s*,\s*(?:\[[^\]]*\]\s*,\s*)?[\'"](Modules\.Editionbasic\.[A-Za-z]+)[\'"]/s';
 $checked = 0;
 $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS));
@@ -58,7 +59,13 @@ foreach ($files as $file) {
     if (!preg_match('/\.php$/', $path) || preg_match('#/(vendor|dev|\.github)/#', $path)) {
         continue;
     }
-    preg_match_all($pattern, (string) file_get_contents($path), $matches, PREG_SET_ORDER);
+    $source = (string) file_get_contents($path);
+    preg_match_all($pattern, $source, $matches, PREG_SET_ORDER);
+    // The controllers' translate('text'), which always uses the Admin domain.
+    preg_match_all('/->translate\(\s*([\'"])((?:\\\\.|(?!\1).)*)\1\s*\)/s', $source, $adminMatches, PREG_SET_ORDER);
+    foreach ($adminMatches as $match) {
+        $matches[] = [$match[0], $match[1], $match[2], 'Modules.Editionbasic.Admin'];
+    }
     foreach ($matches as $match) {
         $text = stripslashes($match[2]);
         ++$checked;
