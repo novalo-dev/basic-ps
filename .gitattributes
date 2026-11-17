@@ -1,0 +1,9 @@
+# Kept out of the module zip: the zip holds only what a shop runs.
+/.github export-ignore
+/dev export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/.php-cs-fixer.dist.php export-ignore
+/phpstan.dist.neon export-ignore
+/phpstan-module.neon export-ignore
+/README.md export-ignore

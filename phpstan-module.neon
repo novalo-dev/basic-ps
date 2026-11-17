@@ -1,0 +1,14 @@
+# The module's PHPStan settings, without the PrestaShop extension: each runner
+# brings that one itself. phpstan.dist.neon adds it from dev/tools for the shop
+# jobs; PrestaShop's own PHPStan action adds it from the module's vendor folder.
+parameters:
+    level: 5
+    phpVersion: 70400
+    paths:
+        - ps_edition_basic.php
+        - src
+        - upgrade
+    excludePaths:
+        - vendor
+        - dev
+    reportUnmatchedIgnoredErrors: false

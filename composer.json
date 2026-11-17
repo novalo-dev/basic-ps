@@ -1,0 +1,25 @@
+{
+    "name": "basic-ps/ps_edition_basic",
+    "type": "prestashop-module",
+    "description": "PrestaShop Edition Basic, reworked for PrestaShop 8 and 9: simplified menu and settings page.",
+    "license": "AFL-3.0",
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "PrestaShop\\Module\\PsEditionBasic\\": "src/"
+        },
+        "classmap": [
+            "ps_edition_basic.php"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "prepend-autoloader": false,
+        "sort-packages": true
+    },
+    "require-dev": {
+        "prestashop/php-dev-tools": "^5.0"
+    }
+}

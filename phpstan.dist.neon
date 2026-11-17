@@ -1,0 +1,5 @@
+# Static analysis against a real PrestaShop, found through _PS_ROOT_DIR_:
+#   _PS_ROOT_DIR_=/path/to/prestashop dev/tools/vendor/bin/phpstan analyse -c phpstan.dist.neon
+includes:
+    - dev/tools/vendor/prestashop/php-dev-tools/phpstan/ps-module-extension.neon
+    - phpstan-module.neon

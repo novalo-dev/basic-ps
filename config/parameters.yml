@@ -1,0 +1,5 @@
+parameters:
+  # Assets are bundled in the module, so the back office no longer depends on
+  # a CDN or on a .env file. Paths are relative to the module folder.
+  ps_edition_basic.env: "prod"
+  ps_edition_basic.edition_basic_homepage_js: "views/js/homepage/assets/index.js"

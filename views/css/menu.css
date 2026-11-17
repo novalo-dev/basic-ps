@@ -1,0 +1,12 @@
+/*
+ * Icon font of the simplified menu, which draws its icons in a web component.
+ * It used to come from Google Fonts; it now ships with the module (Apache 2.0).
+ * Declared here because a web component only sees fonts declared on the page.
+ */
+@font-face {
+  font-family: 'Material Icons Round';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url(../fonts/material-icons-round.woff2) format('woff2');
+}

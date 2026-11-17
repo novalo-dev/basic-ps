@@ -1,0 +1,130 @@
+/*
+ * Once the side bar is scrolled to its end, the browser hands the remaining wheel
+ * movement to the page, which then scrolls behind the menu. With the PrestaShop 9
+ * stylesheets the side bar itself is the scrolling box, so the scroll is kept there.
+ * Setting it on the inner .nav-bar-overflow instead, which never scrolls under these
+ * stylesheets, stopped the wheel from reaching the side bar at all.
+ */
+.nav-bar {
+  overscroll-behavior: contain;
+}
+
+/*
+ * PrestaShop 9 dropped the rules hiding the "mobile version not available" notice
+ * that PrestaShop 8 pages still print, so it showed on desktop. These are the
+ * PrestaShop 8 rules; its own script still shows the notice on small screens.
+ */
+#non-responsive {
+  position: fixed;
+  top: 3.438rem;
+  left: .125rem;
+  z-index: 501;
+  display: none;
+  width: 100%;
+  height: 100%;
+  padding: 4.375rem 2.5rem 0;
+  font-size: 1.063rem;
+  color: #fff;
+  background: #363a41;
+}
+
+#non-responsive h1 {
+  font-size: 1.875rem;
+  font-weight: 400;
+  color: #fff;
+}
+
+/*
+ * Same space under the last block on every page. Symfony pages end with 16px of
+ * padding under a card's 24px margin; legacy pages had 60px under a panel's 20px,
+ * kept from a footer PrestaShop no longer shows, so they get 20px here.
+ */
+#main {
+  padding-bottom: 1.25rem;
+}
+
+/*
+ * Legacy pages started their first block 3px under the page header (7px under the
+ * tabs when they have some), against 16px on Symfony pages: both get the same space.
+ * Pages shown in a modal have no page header and keep their own padding.
+ */
+body:not(.display-modal) #content.bootstrap {
+  padding-top: calc(var(--cdk-page-head-height) + .8125rem);
+}
+
+body:not(.display-modal) #content.bootstrap.with-tabs {
+  padding-top: calc(var(--cdk-page-head-with-tabs-height) + .625rem);
+}
+
+/*
+ * Key figure icons in the same black as the rest of the PrestaShop 9 interface;
+ * the figures themselves keep their colour. Covers both the Symfony pages
+ * (.kpi-content.-colorN) and the legacy ones (.box-stats.colorN).
+ */
+.kpi-content[class*="-color"] i,
+.bootstrap .box-stats[class*="color"] .kpi-content i {
+  color: var(--cdk-primary-800) !important;
+}
+
+/*
+ * Under the PrestaShop 9 stylesheets the side bar shows the browser's full-width
+ * scrollbar. Kept thin, as the PrestaShop 8 overlay scrollbar was, and widened
+ * while the pointer is over the menu so it stays easy to grab.
+ */
+@supports selector(::-webkit-scrollbar) {
+  .nav-bar::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .nav-bar:hover::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .nav-bar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .nav-bar::-webkit-scrollbar-thumb {
+    background: rgba(29, 29, 27, .3);
+    border-radius: 4px;
+  }
+
+  .nav-bar::-webkit-scrollbar-thumb:hover {
+    background: rgba(29, 29, 27, .5);
+  }
+}
+
+/* Browsers without those selectors (Firefox) only offer the thin variant. */
+@supports not selector(::-webkit-scrollbar) {
+  .nav-bar {
+    scrollbar-width: thin;
+  }
+}
+
+/*
+ * PrestaShop 8 templates draw secondary actions (Configure and Upgrade in the
+ * module manager, a payment module's Configure, a currency's Reset) as
+ * btn-primary-reverse btn-outline-primary. PrestaShop 9 templates switched those
+ * to btn-outline-secondary, and its stylesheet now fills btn-outline-primary in
+ * grey, so these buttons get the white outlined look PrestaShop 9 shows there.
+ */
+.btn-outline-primary.btn-primary-reverse,
+.module-actions .btn-outline-primary,
+.btn-outline-primary.card-currency-reset {
+  background-color: var(--cdk-white, #fff);
+}
+
+.btn-outline-primary.btn-primary-reverse:hover,
+.module-actions .btn-outline-primary:hover,
+.btn-outline-primary.card-currency-reset:hover {
+  background-color: var(--cdk-primary-300, #eee);
+}
+
+.btn-outline-primary.btn-primary-reverse:focus,
+.btn-outline-primary.btn-primary-reverse:active,
+.module-actions .btn-outline-primary:focus,
+.module-actions .btn-outline-primary:active,
+.btn-outline-primary.card-currency-reset:focus,
+.btn-outline-primary.card-currency-reset:active {
+  background-color: var(--cdk-primary-400, #ddd);
+}

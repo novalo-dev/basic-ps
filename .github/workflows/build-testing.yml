@@ -1,0 +1,34 @@
+name: Build for Testing
+
+# Builds the zip to install on a shop and keeps it as an artifact. Nothing is
+# ever published: there are no releases.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build the module zip
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: composer
+      - name: Build
+        id: build
+        run: |
+          dev/package/build.sh "$RUNNER_TEMP/pack"
+          VERSION=$(sed -n "s#.*\$this->version = '\(.*\)';.*#\1#p" ps_edition_basic.php)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+      # The artifact is the folder: GitHub zips it on download, with
+      # ps_edition_basic/ at the root, as the module upload expects.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ps_edition_basic-${{ steps.build.outputs.version }}
+          path: ${{ runner.temp }}/pack
+          retention-days: 14

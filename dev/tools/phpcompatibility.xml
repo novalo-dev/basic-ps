@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!--
+  Every construct, function and class the module uses must exist on PHP 7.4, the
+  lowest version PrestaShop 8 shops run that the module's code supports, and on
+  every version after it. php -l only proves the files parse on the PHP running it.
+-->
+<ruleset name="basic-ps PHP compatibility">
+    <file>../../ps_edition_basic.php</file>
+    <file>../../src</file>
+    <file>../../upgrade</file>
+    <arg name="extensions" value="php"/>
+    <config name="testVersion" value="7.4-"/>
+    <rule ref="PHPCompatibility"/>
+</ruleset>

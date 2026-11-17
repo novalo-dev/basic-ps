@@ -1,0 +1,224 @@
+name: PHP tests
+
+# The code read on its own: syntax, PHP compatibility, coding standard, static
+# analysis against PrestaShop 8 and 9 (ours and PrestaShop's action), translations,
+# licence headers, the Symfony container, and the module folder a shop installs.
+on:
+  push:
+    branches: [develop]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: php-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: PHP ${{ matrix.php }} syntax
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 7.4 to 8.1 for PrestaShop 8 shops, 8.1 and up for PrestaShop 9.
+        php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: none
+      - name: php -l on every PHP file
+        run: |
+          find . -name '*.php' -not -path './dev/*' -not -path './.github/*' -print0 \
+            | xargs -0 -n1 -P4 php -d display_errors=stderr -l > /dev/null
+
+  coding-standard:
+    name: PrestaShop coding standard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: cs2pr
+      - name: Install dev tools
+        run: composer install --working-dir=dev/tools --no-interaction --no-progress
+      - name: php-cs-fixer
+        run: dev/tools/vendor/bin/php-cs-fixer fix --dry-run --using-cache=no --format=checkstyle | cs2pr
+
+  phpstan:
+    name: PHPStan on PrestaShop ${{ matrix.prestashop }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Official images; the PrestaShop files are already in /var/www/html.
+        prestashop: ['8.0.0-8.1', '9.0-8.1']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+      - name: Install dev tools
+        run: composer install --working-dir=dev/tools --no-interaction --no-progress
+      - name: Module autoloader
+        run: composer dump-autoload --no-interaction
+      - name: Analyse inside the PrestaShop image
+        run: |
+          docker run --rm \
+            -v "$PWD:/var/www/html/modules/ps_edition_basic" \
+            -w /var/www/html/modules/ps_edition_basic \
+            -e _PS_ROOT_DIR_=/var/www/html \
+            --entrypoint php \
+            prestashop/prestashop:${{ matrix.prestashop }} \
+            -d memory_limit=1G \
+            dev/tools/vendor/bin/phpstan analyse -c phpstan.dist.neon --no-progress --error-format=github
+
+  phpstan-prestashop:
+    # PrestaShop's own PHPStan action, the one its modules run: PrestaShop sources
+    # at that release and the PHPStan version they lock. Pinned to a commit.
+    name: PrestaShop PHPStan action on ${{ matrix.prestashop }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        prestashop: ['8.2.x', '9.0.3']
+    steps:
+      # The action copies the module from a folder named after it.
+      - uses: actions/checkout@v4
+        with:
+          path: ps_edition_basic
+      - uses: PrestaShop/.github/.github/actions/php-ci/phpstan@d44abaa07d60927acbe6ece78e649f342c5b7169
+        with:
+          php-version: '8.1'
+          presta-version: ${{ matrix.prestashop }}
+          module-name: ps_edition_basic
+          phpstan-config: phpstan-module.neon
+
+  php-compatibility:
+    # php -l proves the files parse on the PHP running it; this reads every
+    # construct, function and class against each version from 7.4 up.
+    name: PHP 7.4+ compatibility
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: cs2pr
+      - name: Install dev tools
+        run: composer install --working-dir=dev/tools --no-interaction --no-progress
+      - name: PHPCompatibility
+        run: dev/tools/vendor/bin/phpcs -q --standard=dev/tools/phpcompatibility.xml --report=checkstyle | cs2pr
+
+  translations:
+    name: Translations
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: none
+      - name: Catalogues valid, every locale complete, every translated string present
+        run: php .github/scripts/check-translations.php .
+
+  package:
+    name: Module folder
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+      - name: Licence header on every PHP file
+        run: php .github/scripts/check-headers.php .
+      - name: Build the module folder
+        run: dev/package/build.sh "$RUNNER_TEMP/pack"
+      - name: index.php in every folder, nothing from the dev folders
+        run: |
+          cd "$RUNNER_TEMP/pack/ps_edition_basic"
+          MISSING=$(find . -type d ! -exec test -e '{}/index.php' ';' -print)
+          [ -z "$MISSING" ] || { echo "$MISSING" | sed 's/^/::error::index.php missing in /'; exit 1; }
+          for path in .github dev README.md phpstan.dist.neon .php-cs-fixer.dist.php; do
+            [ ! -e "$path" ] || { echo "::error::$path must not be in the module"; exit 1; }
+          done
+      - name: The same version in config.xml and the module class
+        run: |
+          XML=$(sed -n 's#.*<version><!\[CDATA\[\(.*\)\]\]></version>.*#\1#p' config.xml)
+          PHP=$(sed -n "s#.*\$this->version = '\(.*\)';.*#\1#p" ps_edition_basic.php)
+          echo "config.xml $XML, ps_edition_basic.php $PHP"
+          [ -n "$XML" ] && [ "$XML" = "$PHP" ] || { echo "::error::config.xml and ps_edition_basic.php disagree on the version"; exit 1; }
+          echo "$PHP" | grep -Eq '^[0-9]+\.[0-9]\.[0-9]$' || { echo "::error::$PHP: each digit after the first goes 0 to 9"; exit 1; }
+      - name: Nothing loaded from outside the shop
+        # Scripts, style sheets, fonts and images are shipped in the module: a file
+        # fetched from another site runs with the back office and learns who opened it.
+        run: |
+          pattern="(<script[^>]*src=[\"']?|<link[^>]*href=[\"']?|@import[[:space:]]+(url\()?[\"']?|url\([[:space:]]*[\"']?)(https?:)?//"
+          if grep -rnoE "$pattern" views/ config/ --include=*.tpl --include=*.twig --include=*.css --include=*.js --include=*.html; then
+            echo "::error::A file above loads a resource from outside the shop."
+            exit 1
+          fi
+      - name: No keys or ids of the original module
+        run: |
+          if grep -rnE "module_key|addons_id|userflow_id|writeKey:\"[A-Za-z0-9]{8,}|api_get\?key=" --include=*.php --include=*.js --include=*.tpl --include=*.twig --include=*.yml . \
+             | grep -v '^./.github/'; then
+            echo "::error::A key or an id of the original module is back."
+            exit 1
+          fi
+
+  container:
+    name: Symfony container on Symfony ${{ matrix.symfony }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - symfony: '4.4'  # PrestaShop 8
+          - symfony: '6.4'  # PrestaShop 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+      - name: Install the Symfony components PrestaShop uses
+        run: |
+          mkdir -p "$RUNNER_TEMP/sf"
+          cd "$RUNNER_TEMP/sf"
+          # Symfony 4.4 carries security advisories Composer refuses by default.
+          # Nothing here serves a request: the components only compile two files.
+          echo '{"config": {"audit": {"block-insecure": false}}}' > composer.json
+          COMPOSER_NO_SECURITY_BLOCKING=1 composer require --no-interaction --no-progress \
+            symfony/dependency-injection:^${{ matrix.symfony }} \
+            symfony/config:^${{ matrix.symfony }} \
+            symfony/yaml:^${{ matrix.symfony }} \
+            symfony/routing:^${{ matrix.symfony }} \
+            symfony/event-dispatcher:^${{ matrix.symfony }} \
+            symfony/http-kernel:^${{ matrix.symfony }} \
+            symfony/expression-language:^${{ matrix.symfony }}
+      - name: Module autoloader
+        run: composer dump-autoload --no-interaction
+      - name: Compile the services, resolve the routes
+        run: php .github/scripts/compile-container.php "$RUNNER_TEMP/sf/vendor" .
+
+  passed:
+    # One name to require, whatever the matrices become.
+    name: CI passed
+    needs: [lint, coding-standard, phpstan, phpstan-prestashop, php-compatibility, translations, package, container]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job green
+        run: |
+          echo '${{ toJSON(needs) }}' | jq -e 'to_entries | all(.value.result == "success")' > /dev/null

@@ -1,0 +1,17 @@
+ps_edition_basic_settings:
+  path: pseditionbasic/settings
+  methods: [GET, POST]
+  defaults:
+    _controller: PrestaShop\Module\PsEditionBasic\Controller\AdminPsEditionBasicSettingsController::indexAction
+    _legacy_controller: "CONFIGURE"
+    _legacy_link: "CONFIGURE"
+
+
+ps_edition_basic_clean_mbo_cache:
+  path: pseditionbasic/cache-clear
+  methods: [PATCH]
+  defaults:
+    _controller: PrestaShop\Module\PsEditionBasic\Controller\AdminPsEditionBasicCacheController::handleRequest
+    _legacy_controller: "AdminPsEditionBasicCacheController"
+    _legacy_link: "AdminPsEditionBasicCacheController"
+
