@@ -30,6 +30,14 @@ const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
 const errors = [];
 let step = 'start';
 
+// What the module's own scripts write to the console fails the run too: they run
+// on every back office page, where nobody opens the console to notice.
+page.on('console', (message) => {
+    if (['error', 'warning'].includes(message.type()) && (message.location().url || '').includes('/modules/ps_edition_basic/')) {
+        errors.push(`${step}: console ${message.type()}: ${message.text().slice(0, 200)}`);
+    }
+});
+
 // A script error fails the run when it comes from the module's own files.
 page.on('pageerror', (error) => {
     const frame = String(error.stack || '').split('\n').find((line) => /https?:\/\//.test(line)) || '';
@@ -90,6 +98,74 @@ const open = async (url) => {
         throw new Error(`PHP message on the page: "${found[0]}"`);
     }
 };
+
+// Text drawn over other text: what a layout missing a spacing looks like, in a
+// page or in a window another module opens.
+const overlaps = (scope) => page.evaluate((selector) => {
+    const root = document.querySelector(selector);
+    if (!root) {
+        return [];
+    }
+    const boxes = [];
+    for (const element of root.querySelectorAll('*')) {
+        const text = [...element.childNodes].filter((node) => node.nodeType === 3).map((node) => node.textContent.trim()).join(' ').trim();
+        const style = getComputedStyle(element);
+        const box = element.getBoundingClientRect();
+        if (text.length < 2 || box.width < 4 || box.height < 4 || style.visibility === 'hidden' || parseFloat(style.opacity) < 0.05) {
+            continue;
+        }
+        // Only text actually painted: inside the window, not clipped by a scrolled
+        // frame, and not behind an opaque layer. Text under other text that has no
+        // background of its own is still seen: that is the fault looked for.
+        const x = box.left + Math.min(box.width / 2, 6);
+        const y = box.top + box.height / 2;
+        if (x < 0 || y < 0 || x >= innerWidth || y >= innerHeight) {
+            continue;
+        }
+        let clipped = false;
+        for (let frame = element.parentElement; frame && frame !== document.body; frame = frame.parentElement) {
+            const overflow = getComputedStyle(frame);
+            if (overflow.overflowX !== 'visible' || overflow.overflowY !== 'visible') {
+                const edge = frame.getBoundingClientRect();
+                if (x < edge.left || x > edge.right || y < edge.top || y > edge.bottom) {
+                    clipped = true;
+                    break;
+                }
+            }
+        }
+        const top = document.elementFromPoint(x, y);
+        const opaque = (layer) => {
+            for (let node = layer; node && !node.contains(element); node = node.parentElement) {
+                const colour = (getComputedStyle(node).backgroundColor.match(/[\d.]+/g) || []).map(Number);
+                if ((colour.length === 3) || (colour.length === 4 && colour[3] > 0.5) || getComputedStyle(node).backgroundImage !== 'none') {
+                    return true;
+                }
+            }
+            return false;
+        };
+        if (clipped || !top || (!(element === top || element.contains(top)) && opaque(top))) {
+            continue;
+        }
+        boxes.push({ element, text, box });
+    }
+    const found = [];
+    for (let i = 0; i < boxes.length && found.length < 5; ++i) {
+        for (let j = i + 1; j < boxes.length; ++j) {
+            const [a, b] = [boxes[i], boxes[j]];
+            if (a.element.contains(b.element) || b.element.contains(a.element)) {
+                continue;
+            }
+            const width = Math.min(a.box.right, b.box.right) - Math.max(a.box.left, b.box.left);
+            const height = Math.min(a.box.bottom, b.box.bottom) - Math.max(a.box.top, b.box.top);
+            const smaller = Math.min(a.box.width * a.box.height, b.box.width * b.box.height);
+            if (width > 0 && height > 0 && width * height > smaller * 0.3) {
+                found.push(`"${a.text.slice(0, 25)}" over "${b.text.slice(0, 25)}"`);
+                break;
+            }
+        }
+    }
+    return found;
+}, scope);
 
 // What the module must have done to the page in front of the browser.
 const lookChecks = async () => {
@@ -195,6 +271,10 @@ const lookChecks = async () => {
         if (clashes.length > 0) {
             throw new Error(clashes.join('; '));
         }
+        const stacked = await overlaps('body');
+        if (stacked.length > 0) {
+            throw new Error(`text over text: ${stacked.join('; ')}`);
+        }
     } else if (ours.length > 0) {
         throw new Error('the module changes the stylesheets of PrestaShop 9');
     }
@@ -249,6 +329,31 @@ if (signedIn) {
                 await lookChecks();
             });
         }
+    }
+
+    // PrestaShop's module catalogue adds a window of recommended modules to pages
+    // such as the orders list; its content comes from Addons when it opens.
+    const ordersPage = links.find(([href]) => /sell\/orders\/(\?|$)|controller=AdminOrders/.test(href));
+    if (ordersPage) {
+        await check('recommended modules window', async () => {
+            await open(ordersPage[0]);
+            const button = page.locator('#recommended-modules-button');
+            if (await button.count() === 0) {
+                console.log('no recommended modules button on this shop');
+                return;
+            }
+            await button.first().click();
+            await page.locator('#modules_list_container .modal-content').waitFor({ state: 'visible', timeout: 30000 });
+            await page.waitForTimeout(8000);
+            await view('7-recommended-modules');
+            if (isPs8) {
+                const stacked = await overlaps('#modules_list_container .modal-content');
+                if (stacked.length > 0) {
+                    throw new Error(`text over text in the window: ${stacked.join('; ')}`);
+                }
+            }
+            await page.keyboard.press('Escape');
+        });
     }
 
     await check('switch the simplified menu on', async () => {

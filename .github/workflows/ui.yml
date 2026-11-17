@@ -113,6 +113,18 @@ jobs:
             || { echo "::error title=Module install failed::$(tail -n 40 module.log | sed -e 's/%/%25/g' -e ':a;N;$!ba;s/\n/%0A/g')"; exit 1; }
           grep -qiE 'succe' module.log || { echo "::error title=Module install failed::$(tail -n 40 module.log | sed -e 's/%/%25/g' -e ':a;N;$!ba;s/\n/%0A/g')"; exit 1; }
 
+      # The module catalogue shops run on PrestaShop 8.0.2 and up: its window of
+      # recommended modules is one of the screens other modules draw in the back
+      # office, and has to hold up under the PrestaShop 9 look.
+      - name: PrestaShop's module catalogue
+        if: matrix.prestashop == '8.2'
+        run: |
+          git clone --quiet --depth 1 --branch v4.14.3 https://github.com/PrestaShopCorp/ps_mbo.git "$RUNNER_TEMP/ps_mbo"
+          composer install --working-dir="$RUNNER_TEMP/ps_mbo" --no-dev --no-interaction --no-progress --ignore-platform-reqs
+          docker cp "$RUNNER_TEMP/ps_mbo" shop:/var/www/html/modules/ps_mbo
+          docker exec shop chown -R www-data:www-data /var/www/html/modules/ps_mbo
+          docker exec -u www-data -w /var/www/html shop php bin/console prestashop:module install ps_mbo
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
