@@ -69,9 +69,6 @@ class AdminPsEditionBasicSettingsController extends AdminPsEditionBasicControlle
     private function cardTexts(): array
     {
         return [
-            'AdminSmbEditionManageDomainNameController' => [$this->translate("Secure your store's domain so customers can trust it and find it easily."), 'web'],
-            'AdminPsxlegalassistantController' => [$this->translate('Follow our legal assistant to create your own shop policies.'), 'collections_bookmark'],
-            'AdminSmbEditionManageSubscriptionController' => [$this->translate('Manage your subscription according to your needs.'), 'loyalty'],
             'AdminParentModulesSf' => [$this->translate('Install, configure and update your modules.'), 'extension'],
             'AdminParentThemes' => [$this->translate('Customize the theme, logo, pages and positions of your store.'), 'desktop_mac'],
             'AdminParentShipping' => [$this->translate('Choose or combine the shipping methods that suit you best.'), 'local_shipping'],
@@ -79,7 +76,6 @@ class AdminPsEditionBasicSettingsController extends AdminPsEditionBasicControlle
             'AdminInternational' => [$this->translate('Display the different countries, languages, and currencies you want to activate on your store.'), 'language'],
             'ShopParameters' => [$this->translate('Configure all the technical settings to make your shop work.'), 'stars'],
             'AdminAdvancedParameters' => [$this->translate('Configure the operation of your shop.'), 'settings_ethernet'],
-            'AdminNtbackupandrestore' => [$this->translate('Restore your shop in a few clicks.'), 'restore'],
         ];
     }
 

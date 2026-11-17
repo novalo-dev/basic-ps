@@ -37,21 +37,6 @@
         <target state="translated">La modification n'a pas pu être enregistrée. Rechargez la page et réessayez.</target>
         <note>Line: </note>
       </trans-unit>
-      <trans-unit id="1ac3d31760fed0a921e411d435191348">
-        <source>Secure your store's domain so customers can trust it and find it easily.</source>
-        <target state="translated">Sécurisez le domaine de votre magasin pour que les clients puissent avoir confiance et le trouver facilement.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="e2ab0cecd2ced0b94a1bd11520a58156">
-        <source>Follow our legal assistant to create your own shop policies.</source>
-        <target state="translated">Suivez notre assistant juridique pour créer vos propres politiques de boutique.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="a4ff7a4bd66ea4be29e7b1b8e154a062">
-        <source>Manage your subscription according to your needs.</source>
-        <target state="translated">Gérez votre abonnement selon vos besoins.</target>
-        <note>Line: </note>
-      </trans-unit>
       <trans-unit id="d1aa169b81493d759c2ac2f9cf29bbaf">
         <source>Install, configure and update your modules.</source>
         <target state="translated">Installez, configurez et mettez à jour vos modules.</target>
@@ -85,11 +70,6 @@
       <trans-unit id="084ffde80fa7f47877a183b2e2430aa5">
         <source>Configure the operation of your shop.</source>
         <target state="translated">Configurez le fonctionnement de votre boutique.</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="26a1c96fc104fc3e60a7c896d81a0c62">
-        <source>Restore your shop in a few clicks.</source>
-        <target state="translated">Restaurez votre boutique en quelques clics.</target>
         <note>Line: </note>
       </trans-unit>
       <trans-unit id="efdaf9f44ce968366fa78277263abc1d">

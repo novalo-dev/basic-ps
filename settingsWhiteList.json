@@ -1,13 +1,9 @@
 [
   "AdminParentModulesSf",
   "AdminParentThemes",
-  "AdminSmbEditionManageDomainNameController",
-  "AdminPsxlegalassistantController",
-  "AdminSmbEditionManageSubscriptionController",
   "AdminParentShipping",
   "AdminParentPayment",
   "AdminInternational",
   "ShopParameters",
-  "AdminAdvancedParameters",
-  "AdminNtbackupandrestore"
+  "AdminAdvancedParameters"
 ]
