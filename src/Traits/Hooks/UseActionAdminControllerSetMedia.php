@@ -51,7 +51,7 @@ trait UseActionAdminControllerSetMedia
         // they are swapped for the PS 9 build in place, keeping their order. On
         // PrestaShop 8 this hook only ever comes from AdminController::setMedia().
         $controller = $this->context->controller;
-        if (!$controller instanceof \AdminController) {
+        if (!$controller instanceof \AdminController || $this->keepsPrestaShop8Look()) {
             return;
         }
         $controller->css_files = (new \PrestaShop\Module\PsEditionBasic\Theme\Ps9Theme($this))->swapCssFiles($controller->css_files);

@@ -67,7 +67,7 @@ class Ps9ThemeSubscriber implements EventSubscriberInterface
         }
 
         $module = \Module::getInstanceByName('ps_edition_basic');
-        if (!$module instanceof \ps_edition_basic || !\Module::isEnabled('ps_edition_basic')) {
+        if (!$module instanceof \ps_edition_basic || !\Module::isEnabled('ps_edition_basic') || $module->keepsPrestaShop8Look()) {
             return;
         }
 
