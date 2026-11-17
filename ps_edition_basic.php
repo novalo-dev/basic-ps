@@ -46,7 +46,7 @@ class ps_edition_basic extends Module
     public function __construct()
     {
         $this->name = 'ps_edition_basic';
-        $this->version = '1.2.2';
+        $this->version = '1.2.3';
         $this->tab = 'administration';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
@@ -160,7 +160,8 @@ class ps_edition_basic extends Module
      * Module pages that stay in the PrestaShop 8 look. PrestaShop Checkout draws its
      * configuration page for the PrestaShop 8 stylesheet, outside the bootstrap
      * frame, and does not hold together under the PrestaShop 9 one: that page keeps
-     * PrestaShop 8's stylesheet and none of the fixes written for the 9 one.
+     * PrestaShop 8's stylesheet and its breadcrumb, with none of the fixes written
+     * for the 9 one, under the PrestaShop 9 top bar only (views/css/ps9-header.css).
      */
     public function keepsPrestaShop8Look(): bool
     {

@@ -115,8 +115,9 @@
   background: white;
 }
 
-.page-head ul.breadcrumb,
-.header-toolbar ol.breadcrumb {
+/* Only around the simplified breadcrumb: PrestaShop's own keeps its height. */
+.page-head ul.breadcrumb:has(.peb-breadcrumb),
+.header-toolbar ol.breadcrumb:has(.peb-breadcrumb) {
   padding-block: 0 !important;
 }
 
