@@ -288,13 +288,15 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, .12);
 }
 
-/* Above the card's stretched link, so it takes the click; ps-switch is a block
-   as wide as its row otherwise. */
-.peb-settings__switch {
+/* Above the card's stretched link, so it takes the click. Without its labels,
+   ps-switch is only its slider: it gets the slider's width, and none of the
+   top margin it keeps for a label line. */
+.peb-settings .peb-settings__switch {
   position: relative;
   z-index: 2;
   flex: 0 0 auto;
-  width: auto;
+  width: 3.25rem;
+  margin-top: 0;
 }
 
 .peb-settings__card[aria-busy="true"] .peb-settings__switch {

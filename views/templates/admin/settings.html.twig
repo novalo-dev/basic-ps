@@ -72,14 +72,15 @@
                                        {% if card.links is not empty %}data-peb-open="module-{{ loop.index }}"{% endif %}>{{ card.name }}</a>
                                     {% if card.description is not empty %}<div class="text-muted small mt-1">{{ card.description }}</div>{% endif %}
                                 </div>
-                                <span class="ps-switch ps-switch-sm ml-3 peb-settings__switch" title="{{ texts.switchHelp }}" aria-label="{{ texts.switch }}">
+                                {# The arrow first, the switch at the very right. #}
+                                {% if card.links is not empty %}<i class="material-icons text-muted ml-3" aria-hidden="true">chevron_right</i>{% endif %}
+                                <span class="ps-switch ps-switch-lg ps-switch-nolabel ml-3 peb-settings__switch" title="{{ texts.switchHelp }}" aria-label="{{ texts.switch }}">
                                     <input type="radio" name="peb-menu-{{ loop.index }}" id="peb-menu-{{ loop.index }}-off" value="0"{% if not card.shown %} checked{% endif %}>
                                     <label for="peb-menu-{{ loop.index }}-off">{{ texts.no }}</label>
                                     <input type="radio" name="peb-menu-{{ loop.index }}" id="peb-menu-{{ loop.index }}-on" value="1"{% if card.shown %} checked{% endif %}>
                                     <label for="peb-menu-{{ loop.index }}-on">{{ texts.yes }}</label>
                                     <span class="slide-button"></span>
                                 </span>
-                                {% if card.links is not empty %}<i class="material-icons text-muted ml-3" aria-hidden="true">chevron_right</i>{% endif %}
                             </div>
                         </div>
                     </div>
