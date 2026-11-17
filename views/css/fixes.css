@@ -59,23 +59,25 @@ body:not(.display-modal) #content.bootstrap.with-tabs {
 
 /*
  * Some modules render their configuration page outside PrestaShop's bootstrap
- * frame (PrestaShop Checkout among them): the content is then #content.nobootstrap,
- * which the PrestaShop 9 stylesheet still sizes for PrestaShop 1.6, with 110px
- * reserved above and 200px on the left against a 13rem menu. It gets the same
- * frame as every other page.
+ * frame (PrestaShop Checkout among them): the content is then #content.nobootstrap.
+ * Its app places some blocks against the edges of that box, so the box itself
+ * starts beside the menu, as PrestaShop places it, rather than under it with a
+ * padding: blocks against its left edge went under the menu. Its top padding
+ * reserved 110px for the page header, which is now in the page, and its 1200px
+ * minimum, wider than the space beside the menu, made the page scroll sideways.
  */
 body:not(.display-modal) #content.nobootstrap {
   min-width: 0;
-  margin-left: 0;
-  padding: 0 var(--cdk-size-16) var(--cdk-size-16) calc(var(--cdk-sidebar-width) + var(--cdk-size-16));
+  margin-left: var(--cdk-sidebar-width);
+  padding-top: 0;
 }
 
 .page-sidebar-closed:not(.mobile) #content.nobootstrap {
-  padding-left: calc(var(--cdk-sidebar-width-collapse) + var(--cdk-size-16));
+  margin-left: var(--cdk-sidebar-width-collapse);
 }
 
 .mobile #content.nobootstrap {
-  padding-left: var(--cdk-size-16);
+  margin-left: 0;
 }
 
 /* Its wrapper also holds the messages some pages print under the header: it gives
@@ -98,6 +100,19 @@ body:not(.display-modal) #content:is(.bootstrap, .nobootstrap) > .bootstrap > .p
 
 .mobile #content:is(.bootstrap, .nobootstrap) > .bootstrap > .page-head {
   margin-left: calc(-1 * var(--cdk-size-16));
+}
+
+/* The same, from the 30px side padding of the frame outside bootstrap. */
+body:not(.display-modal) #content.nobootstrap > .bootstrap > .page-head {
+  margin: 0 -30px var(--cdk-size-16) calc(-1 * (var(--cdk-sidebar-width) + 30px));
+}
+
+.page-sidebar-closed:not(.mobile) #content.nobootstrap > .bootstrap > .page-head {
+  margin-left: calc(-1 * (var(--cdk-sidebar-width-collapse) + 30px));
+}
+
+.mobile #content.nobootstrap > .bootstrap > .page-head {
+  margin-left: -30px;
 }
 
 /* A module's configuration page draws the module manager's header, then its own

@@ -115,9 +115,8 @@
   background: white;
 }
 
-/* Only around the simplified breadcrumb: PrestaShop's own keeps its height. */
-.page-head ul.breadcrumb:has(.peb-breadcrumb),
-.header-toolbar ol.breadcrumb:has(.peb-breadcrumb) {
+.page-head ul.breadcrumb,
+.header-toolbar ol.breadcrumb {
   padding-block: 0 !important;
 }
 
@@ -149,10 +148,4 @@
   top: -.25rem !important;
   left: 123% !important;
   width: 13rem !important;
-}
-
-/* The breadcrumb's links keep their dark colour on the pages that stay in the
-   PrestaShop 8 look, whose stylesheet paints the breadcrumb links white. */
-.puik-style.peb-breadcrumb .puik-link {
-  color: #1d1d1b !important;
 }

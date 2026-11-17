@@ -290,18 +290,6 @@ const lookChecks = async () => {
     }
     const core = state.sheets.filter((href) => /\/themes\/(new-theme|default)\/public\/theme\.css/.test(href));
     const ours = state.sheets.filter((href) => href.includes('/modules/ps_edition_basic/views/ps9/'));
-    // PrestaShop Checkout's configuration page is drawn for the PrestaShop 8
-    // stylesheet and keeps it, without the module's fixes, under the PrestaShop 9
-    // top bar.
-    if (isPs8 && /[?&]configure=ps_checkout(&|$)/.test(page.url())) {
-        if (ours.length > 0 || core.length === 0) {
-            throw new Error("PrestaShop Checkout's page does not keep the PrestaShop 8 stylesheet");
-        }
-        if (!state.sheets.some((href) => href.includes('/modules/ps_edition_basic/views/css/ps9-header.css'))) {
-            throw new Error("PrestaShop Checkout's page misses the PrestaShop 9 top bar");
-        }
-        return;
-    }
     if (isPs8) {
         if (ours.length === 0) {
             throw new Error('the PrestaShop 9 stylesheet of the module is not loaded');
