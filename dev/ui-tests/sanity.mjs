@@ -62,6 +62,21 @@ const check = async (name, run) => {
     return true;
 };
 
+// Views of the back office kept with the run, to look at the result rather than
+// only read it. On a manual run of a PrestaShop 9 shop they are also written to
+// the log, which can be read where the run's files cannot be downloaded.
+const view = async (name) => {
+    await page.waitForTimeout(1500);
+    const file = `${shots}/view-${name}.jpg`;
+    const image = await page.screenshot({ path: file, type: 'jpeg', quality: 80 });
+    if (process.env.PRINT_VIEWS === '1') {
+        const data = image.toString('base64');
+        for (let i = 0; i < data.length; i += 4000) {
+            console.log(`VIEW ${name} ${data.slice(i, i + 4000)}`);
+        }
+    }
+};
+
 const open = async (url) => {
     // load, not networkidle: some PrestaShop modules' pages (Facebook & Instagram)
     // keep calling outside services, and the network never goes quiet.
@@ -140,6 +155,7 @@ if (signedIn) {
         .filter((anchor) => anchor.href.startsWith(root) && !/logout|AdminLogin/i.test(anchor.href))
         .map((anchor) => [anchor.href, (anchor.textContent || '').trim().replace(/\s+/g, ' ')])).entries()], adminRoot);
     console.log(`${links.length} menu pages`);
+    await view('1-native-menu');
 
     for (const [href, label] of links) {
         await check(`page ${label}`, async () => {
@@ -195,6 +211,12 @@ if (signedIn) {
         if (!settingsUrl) {
             throw new Error('the Settings entry has no link');
         }
+        await view('2-simplified-menu');
+        const orders = entries.find((entry) => /Orders$/.test(entry.text));
+        if (orders && orders.href) {
+            await open(orders.href);
+            await view('3-orders-simplified-menu');
+        }
     });
 
     await check('the settings page', async () => {
@@ -205,6 +227,7 @@ if (signedIn) {
         if (titles[0] !== 'AdminParentModulesSf' || titles[1] !== 'AdminParentThemes') {
             throw new Error(`the cards start with ${titles.slice(0, 2).join(', ')} instead of Modules and Design`);
         }
+        await view('4-settings-page');
         await lookChecks();
     });
 }
