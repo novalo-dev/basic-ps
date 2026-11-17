@@ -15,6 +15,11 @@
   min-width: 0;
 }
 
+/* The app's utilities are !important: the pages list keeps its own display rule. */
+#peb-menu-modules .peb-menu-modules__pages[hidden] {
+  display: none !important;
+}
+
 #peb-menu-modules .peb-switch {
   position: relative;
   display: inline-flex;

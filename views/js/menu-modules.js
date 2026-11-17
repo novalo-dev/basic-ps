@@ -30,6 +30,17 @@
   }
 
   section.addEventListener('click', function (event) {
+    // A card with pages of its own opens on them instead of leaving the page.
+    var header = event.target.closest('.peb-menu-modules__link[aria-expanded]');
+    if (header) {
+      event.preventDefault();
+      var open = header.getAttribute('aria-expanded') !== 'true';
+      header.setAttribute('aria-expanded', open ? 'true' : 'false');
+      header.closest('[data-class-name]').querySelector('.peb-menu-modules__pages').hidden = !open;
+      header.querySelector('.peb-menu-modules__arrow').textContent = open ? 'expand_less' : 'expand_more';
+      return;
+    }
+
     var button = event.target.closest('.peb-switch');
     if (!button) {
       return;

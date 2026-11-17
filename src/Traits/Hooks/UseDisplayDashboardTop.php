@@ -27,7 +27,9 @@ trait UseDisplayDashboardTop
 {
     public function hookDisplayDashboardTop(): string
     {
-        if (!\Configuration::get('SMB_IS_NEW_MENU_ENABLED')) {
+        // The simplified breadcrumb is a PrestaShop 8 one: on PrestaShop 9 the module
+        // leaves PrestaShop's own, and this one would be drawn without its data.
+        if (!\Configuration::get('SMB_IS_NEW_MENU_ENABLED') || !$this->isPrestaShop8()) {
             return '';
         }
 

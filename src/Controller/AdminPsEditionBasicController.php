@@ -152,6 +152,13 @@ class AdminPsEditionBasicController extends FrameworkBundleAdminController
                 'icon' => (string) ($tab['icon'] ?: 'extension'),
                 'description' => $description,
                 'shown' => in_array($tab['class_name'], $shown, true),
+                // A module page with pages of its own opens on its links, as the
+                // configuration cards do.
+                'links' => array_values(array_map(function (array $page): array {
+                    return ['name' => (string) $page['name'], 'href' => (string) $page['href']];
+                }, array_filter($tab['sub_tabs'] ?? [], function (array $page): bool {
+                    return (int) ($page['active'] ?? 1) !== 0 && !empty($page['href']);
+                }))),
             ];
         }
 

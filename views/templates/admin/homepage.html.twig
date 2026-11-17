@@ -34,12 +34,18 @@
             {% for card in menuModules %}
                 <div class="puik-card puik-card--default hover:shadow gap-1 overflow-hidden" data-class-name="{{ card.class_name }}">
                     <div class="flex items-center justify-between gap-x-4">
-                        <a href="{{ card.href }}" class="flex items-center gap-x-3 no-underline cursor-pointer peb-menu-modules__link">
-                            <span class="puik-icon p-5 bg-[#EFF3F7] text-[#505969] text-3xl rounded-full w-14 h-14 flex items-center justify-center">{{ card.icon }}</span>
-                            <div class="flex flex-col gap-y-0.5">
-                                <h1 class="puik-h3">{{ card.name }}</h1>
-                                {% if card.description is not empty %}<span>{{ card.description }}</span>{% endif %}
+                        {# Same header as a configuration card: a page with pages of its
+                           own opens on their links, a single page is a link itself. #}
+                        <a href="{{ card.href }}" class="flex items-center justify-between no-underline cursor-pointer peb-menu-modules__link"
+                           {% if card.links is not empty %}aria-expanded="false"{% endif %}>
+                            <div class="flex items-center gap-x-3">
+                                <span class="puik-icon p-5 bg-[#EFF3F7] text-[#505969] text-3xl rounded-full w-14 h-14 flex items-center justify-center">{{ card.icon }}</span>
+                                <div class="flex flex-col gap-y-0.5">
+                                    <h1 class="puik-h3">{{ card.name }}</h1>
+                                    {% if card.description is not empty %}<span>{{ card.description }}</span>{% endif %}
+                                </div>
                             </div>
+                            {% if card.links is not empty %}<span class="puik-icon text-xl font-normal peb-menu-modules__arrow">expand_more</span>{% endif %}
                         </a>
                         <button type="button" role="switch" class="peb-switch"
                                 aria-checked="{{ card.shown ? 'true' : 'false' }}"
@@ -47,6 +53,16 @@
                             <span class="peb-switch__toggle"></span>
                         </button>
                     </div>
+                    {% if card.links is not empty %}
+                        <div class="peb-menu-modules__pages" hidden>
+                            <div class="h-[1px] rounded w-full my-2 bg-[#E4EBF2]"></div>
+                            <div class="grid grid-cols-3">
+                                {% for page in card.links %}
+                                    <a href="{{ page.href }}" target="_self" class="puik-link puik-link--lg">{{ page.name }}</a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             {% endfor %}
         </div>

@@ -457,6 +457,17 @@ if (signedIn) {
             console.log('no module page on this shop: nothing to switch');
             return;
         }
+        // A card whose module has pages of its own opens on their links in place.
+        const opening = page.locator('#peb-menu-modules .peb-menu-modules__link[aria-expanded]').first();
+        if (await opening.count() > 0) {
+            const before = page.url();
+            await opening.click();
+            if (page.url() !== before || !await opening.locator('xpath=ancestor::*[@data-class-name]').locator('.peb-menu-modules__pages').isVisible()) {
+                throw new Error('a module card with pages does not open on them');
+            }
+            await opening.click();
+        }
+
         const card = cards.first();
         const name = (await card.locator('h1').innerText()).trim();
         // An entry with sub-pages also holds its arrow icon's name: matched by inclusion.
