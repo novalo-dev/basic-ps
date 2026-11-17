@@ -344,6 +344,17 @@ const lookChecks = async () => {
             throw new Error(`secondary buttons filled in grey: ${state.grey.join(', ')}`);
         }
         if (clashes.length > 0) {
+            // The boxes of the page frame, to tell which rule placed what.
+            console.log(`LAYOUT ${step}: ${await page.evaluate(() => JSON.stringify([
+                document.querySelector('#main'), document.querySelector('#content'),
+                ...document.querySelectorAll('#content > *, .page-head, .page-head > *'),
+            ].filter(Boolean).map((element) => {
+                const box = element.getBoundingClientRect();
+                const style = getComputedStyle(element);
+                return [`${element.tagName.toLowerCase()}${element.id ? '#' + element.id : ''}.${[...element.classList].join('.')}`,
+                    [box.left, box.top, box.right, box.bottom].map(Math.round), style.display, style.position,
+                    style.margin, style.padding, style.width, style.minWidth, style.boxSizing];
+            })))}`);
             throw new Error(clashes.join('; '));
         }
         const stacked = await overlaps('body');
