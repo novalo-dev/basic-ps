@@ -188,13 +188,15 @@ const lookChecks = async () => {
         // A module's configuration page has two page headers, only the last shown.
         const head = [...document.querySelectorAll('#content.bootstrap .page-head')].filter((element) => element.getBoundingClientRect().height > 0).pop();
         let gap = null;
+        let gapBlock = '';
         if (head && !document.body.classList.contains('display-modal')) {
             const bottom = head.getBoundingClientRect().bottom;
             const blocks = [...document.querySelectorAll('#content.bootstrap .panel, #content.bootstrap .alert, #content.bootstrap form, #content.bootstrap .row')]
                 .filter((block) => !block.closest('.page-head') && block.getBoundingClientRect().height > 10)
-                .map((block) => block.getBoundingClientRect().top);
+                .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
             if (blocks.length) {
-                gap = Math.round(Math.min(...blocks) - bottom);
+                gap = Math.round(blocks[0].getBoundingClientRect().top - bottom);
+                gapBlock = `${blocks[0].tagName.toLowerCase()}.${[...blocks[0].classList].join('.')} "${blocks[0].textContent.trim().slice(0, 40)}"`;
             }
         }
         // Whatever the page, nothing readable may sit under the fixed header, and no
@@ -276,7 +278,7 @@ const lookChecks = async () => {
                 invisible.push(`"${text.textContent.trim().slice(0, 30)}"`);
             }
         }
-        return { sheets, notice: notice ? getComputedStyle(notice).display : 'none', wordIcons, gap, covered, invisible, grey };
+        return { sheets, notice: notice ? getComputedStyle(notice).display : 'none', wordIcons, gap, gapBlock, covered, invisible, grey };
     });
     const clashes = [
         ...state.covered.map((what) => `under the header: ${what}`),
@@ -302,7 +304,7 @@ const lookChecks = async () => {
             throw new Error(`icon names written out: ${[...new Set(state.wordIcons)].join(', ')}`);
         }
         if (state.gap !== null && state.gap < 8) {
-            throw new Error(`the first block starts ${state.gap}px under the page header`);
+            throw new Error(`the first block starts ${state.gap}px under the page header: ${state.gapBlock}`);
         }
         if (state.grey.length > 0) {
             throw new Error(`secondary buttons filled in grey: ${state.grey.join(', ')}`);
