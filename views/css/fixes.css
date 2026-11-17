@@ -57,31 +57,31 @@ body:not(.display-modal) #content.bootstrap.with-tabs {
   padding-top: 0;
 }
 
+/* Its wrapper also holds the messages some pages print under the header: it gives
+   up its box, so only the header sticks, against the whole page. */
 body:not(.display-modal) #content.bootstrap > .bootstrap:has(> .page-head) {
-  position: sticky;
-  top: var(--cdk-header-height);
-  z-index: 499;
-  margin: 0 calc(-1 * var(--cdk-size-16)) var(--cdk-size-16) calc(-1 * (var(--cdk-sidebar-width) + var(--cdk-size-16)));
-}
-
-.page-sidebar-closed:not(.mobile) #content.bootstrap > .bootstrap:has(> .page-head) {
-  margin-left: calc(-1 * (var(--cdk-sidebar-width-collapse) + var(--cdk-size-16)));
-}
-
-.mobile #content.bootstrap > .bootstrap:has(> .page-head) {
-  margin-left: calc(-1 * var(--cdk-size-16));
+  display: contents;
 }
 
 body:not(.display-modal) #content.bootstrap > .bootstrap > .page-head {
-  position: relative;
-  top: auto;
+  position: sticky;
+  top: var(--cdk-header-height);
   left: auto;
   width: auto;
+  margin: 0 calc(-1 * var(--cdk-size-16)) var(--cdk-size-16) calc(-1 * (var(--cdk-sidebar-width) + var(--cdk-size-16)));
+}
+
+.page-sidebar-closed:not(.mobile) #content.bootstrap > .bootstrap > .page-head {
+  margin-left: calc(-1 * (var(--cdk-sidebar-width-collapse) + var(--cdk-size-16)));
+}
+
+.mobile #content.bootstrap > .bootstrap > .page-head {
+  margin-left: calc(-1 * var(--cdk-size-16));
 }
 
 /* A module's configuration page draws the module manager's header, then its own
    over it: only the module's shows, as when both were fixed. */
-body:not(.display-modal) #content.bootstrap > .bootstrap:has(> .page-head):has(~ .bootstrap > .page-head) {
+body:not(.display-modal) #content.bootstrap > .bootstrap:has(~ .bootstrap > .page-head) > .page-head {
   display: none;
 }
 
