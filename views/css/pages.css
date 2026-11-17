@@ -1,8 +1,8 @@
 /*
- * The settings page and the help center. Their templates use the class names of
+ * The settings page and the help center. The help center uses the class names of
  * PrestaShop's design system (puik); the first part of this file is the rules of
- * that system those templates use, as its own stylesheet writes them, so both
- * pages look as they did when an app drew them. They are scoped to .peb-page
+ * that system it uses, as its own stylesheet writes them, so it looks as it did
+ * when an app drew it. They are scoped to .peb-page
  * rather than .puik-style, which the menu shares: the page's utilities would
  * otherwise override the menu's own, such as its responsive display rules. The module's own rules follow.
  */
@@ -222,53 +222,66 @@
   text-decoration: none !important;
 }
 
-/* Module cards: the header shares its row with the switch. */
-#peb-menu-modules .peb-card__header {
-  flex: 1 1 0%;
+/*
+ * The settings page is drawn with the back office's own classes (card, row,
+ * rounded-circle, ps-switch, spinner-border); these few rules only lay them out.
+ */
+.peb-settings {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Bootstrap's rows and flex boxes set a display that outranks the hidden attribute
+   the views are switched with. */
+.peb-settings [hidden] {
+  display: none !important;
+}
+
+.peb-settings__icon {
+  flex: 0 0 auto;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.peb-settings__text {
+  flex: 1 1 auto;
   min-width: 0;
 }
 
-#peb-menu-modules .peb-switch {
+.peb-settings a.peb-settings__name,
+.peb-settings a.peb-settings__name:hover,
+.peb-settings a.peb-settings__name:focus {
+  font-size: 1rem;
+  text-decoration: none !important;
+}
+
+.peb-settings__card {
+  transition: box-shadow .2s ease;
+}
+
+.peb-settings__card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .12);
+}
+
+/* Above the card's stretched link, so it takes the click; ps-switch is a block
+   as wide as its row otherwise. */
+.peb-settings__switch {
   position: relative;
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  width: 2.5rem;
-  height: 1.5rem;
-  padding: 0;
-  border: 0;
-  border-radius: 9999px;
-  background-color: #1d1d1b;
-  cursor: pointer;
-  transition: background-color .2s cubic-bezier(.4, 0, .2, 1);
+  z-index: 2;
+  flex: 0 0 auto;
+  width: auto;
 }
 
-#peb-menu-modules .peb-switch[aria-checked="true"] {
-  background-color: #207f4b;
-}
-
-#peb-menu-modules .peb-switch:focus-visible {
-  outline: 2px solid #174eef;
-  outline-offset: 2px;
-}
-
-#peb-menu-modules .peb-switch[aria-busy="true"] {
+.peb-settings__card[aria-busy="true"] .peb-settings__switch {
   opacity: .6;
-  pointer-events: none;
 }
 
-#peb-menu-modules .peb-switch__toggle {
-  display: inline-block;
-  width: 1.25rem;
-  height: 1.25rem;
-  border-radius: 9999px;
-  background-color: #fff;
-  transform: translateX(.125rem);
-  transition: transform .2s cubic-bezier(.4, 0, .2, 1);
+.peb-settings__waiting {
+  min-height: 120px;
 }
 
-#peb-menu-modules .peb-switch[aria-checked="true"] .peb-switch__toggle {
-  transform: translateX(1.125rem);
+.peb-settings__back {
+  vertical-align: -6px;
 }
 
 /* Support offers: two at a time, the arrows or a swipe show the others. */

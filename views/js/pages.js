@@ -18,28 +18,73 @@
  */
 
 /*
- * The settings page and the help center: cards that open on their pages, the
- * switches that show a module page in the menu, and the support offers slider.
+ * The settings page and the help center: the settings views that open in place,
+ * the switches that show a module page in the menu, and the support offers slider.
  */
 (function () {
   'use strict';
 
+  var WAIT = 250;
+
+  function settings() {
+    return document.getElementById('peb-settings');
+  }
+
+  // One view shows at a time: the sections, the pages of one of them, the module
+  // pages, or the waiting cards between two of them. The address keeps the view,
+  // so a reload or the browser's back button lands on it again.
+  function show(name, wait) {
+    var root = settings();
+    if (!root) {
+      return;
+    }
+    var target = root.querySelector('[data-peb-view="' + name + '"]') ? name : 'home';
+    var views = root.querySelectorAll('[data-peb-view]');
+    var swap = function () {
+      views.forEach(function (view) {
+        view.hidden = view.getAttribute('data-peb-view') !== target;
+      });
+      var view = root.querySelector('[data-peb-view="' + target + '"]');
+      var home = target === 'home';
+      root.querySelector('[data-peb-title]').textContent = home ? root.getAttribute('data-home-title') : view.getAttribute('data-title');
+      root.querySelector('[data-peb-description]').textContent = home ? root.getAttribute('data-home-description') : view.getAttribute('data-description');
+      root.querySelector('[data-peb-nav]').hidden = home;
+      root.querySelector('[data-peb-trail]').textContent = home ? '' : root.getAttribute('data-home-title') + ' \u203A ' + view.getAttribute('data-title');
+    };
+    if (!wait) {
+      swap();
+      return;
+    }
+    views.forEach(function (view) {
+      view.hidden = view.getAttribute('data-peb-view') !== 'waiting';
+    });
+    window.setTimeout(swap, WAIT);
+  }
+
+  function fromAddress(wait) {
+    show(window.location.hash.replace(/^#/, '') || 'home', wait);
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    fromAddress(false);
+  });
+  window.addEventListener('hashchange', function () {
+    fromAddress(true);
+  });
+
   document.addEventListener('click', function (event) {
-    // A card with pages of its own opens on them instead of leaving the page.
-    var header = event.target.closest('.peb-card__header[aria-expanded]');
-    if (header) {
+    var opener = event.target.closest('#peb-settings [data-peb-open]');
+    if (opener) {
       event.preventDefault();
-      var open = header.getAttribute('aria-expanded') !== 'true';
-      var card = header.closest('.peb-card');
-      header.setAttribute('aria-expanded', open ? 'true' : 'false');
-      card.querySelector('.peb-card__pages').classList.toggle('max-h-0', !open);
-      header.querySelector('.peb-card__arrow').textContent = open ? 'expand_less' : 'expand_more';
+      window.location.hash = opener.getAttribute('data-peb-open');
       return;
     }
 
-    var button = event.target.closest('#peb-menu-modules .peb-switch');
-    if (button) {
-      toggleMenuModule(button);
+    if (event.target.closest('#peb-settings [data-peb-back]')) {
+      event.preventDefault();
+      // Back to the sections without leaving an empty "#" in the address.
+      window.history.pushState(null, '', window.location.pathname + window.location.search);
+      show('home', true);
       return;
     }
 
@@ -51,15 +96,30 @@
     }
   });
 
-  function toggleMenuModule(button) {
+  window.addEventListener('popstate', function () {
+    fromAddress(true);
+  });
+
+  document.addEventListener('change', function (event) {
+    var input = event.target.closest('#peb-menu-modules .peb-settings__switch input');
+    if (input) {
+      toggleMenuModule(input);
+    }
+  });
+
+  function toggleMenuModule(input) {
     var section = document.getElementById('peb-menu-modules');
-    var card = button.closest('[data-class-name]');
-    var shown = button.getAttribute('aria-checked') !== 'true';
+    var card = input.closest('[data-class-name]');
+    var shown = input.value === '1';
+    var inputs = card.querySelectorAll('.peb-settings__switch input');
     var body = new FormData();
     body.append('class_name', card.getAttribute('data-class-name'));
     body.append('shown', shown ? '1' : '0');
 
-    button.setAttribute('aria-busy', 'true');
+    card.setAttribute('aria-busy', 'true');
+    inputs.forEach(function (other) {
+      other.disabled = true;
+    });
     fetch(section.getAttribute('data-url'), { method: 'POST', body: body, credentials: 'same-origin' })
       .then(function (response) {
         return response.ok ? response.json() : { saved: false };
@@ -68,14 +128,18 @@
         if (!result.saved) {
           throw new Error('not saved');
         }
-        button.setAttribute('aria-checked', shown ? 'true' : 'false');
         // The menu is drawn by the server: the next page shows the change.
       })
       .catch(function () {
+        // The switch goes back to what is stored.
+        card.querySelector('input[value="' + (shown ? '0' : '1') + '"]').checked = true;
         window.alert(section.getAttribute('data-error'));
       })
       .finally(function () {
-        button.removeAttribute('aria-busy');
+        inputs.forEach(function (other) {
+          other.disabled = false;
+        });
+        card.removeAttribute('aria-busy');
       });
   }
 })();

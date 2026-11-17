@@ -50,10 +50,12 @@ class AdminPsEditionBasicSettingsController extends AdminPsEditionBasicControlle
             'texts' => [
                 'title' => $this->translate('Configuration'),
                 'description' => $this->translate('Configure your shop in a few clicks'),
-                'modulesTitle' => $this->translate('Modules'),
                 'modulesDescription' => $this->translate('Choose the module pages shown in the menu.'),
                 'switch' => $this->translate('Show in the menu'),
                 'error' => $this->translate('The change could not be saved. Reload the page and try again.'),
+                // PrestaShop's own words for its switches, in every language it ships.
+                'yes' => $this->getService('translator')->trans('Yes', [], 'Admin.Global'),
+                'no' => $this->getService('translator')->trans('No', [], 'Admin.Global'),
             ],
             'cards' => $this->settingsCards($tabs),
             'menuModules' => $this->menuModuleCards($tabs),
@@ -101,6 +103,18 @@ class AdminPsEditionBasicSettingsController extends AdminPsEditionBasicControlle
                 'description' => $texts[$className][0] ?? '',
                 'links' => self::links($tab['sub_tabs'] ?? []),
             ];
+        }
+
+        // The section with the most pages spans two columns: its description and
+        // the row it sits in read better wide than squeezed into one.
+        $widest = null;
+        foreach ($cards as $index => $card) {
+            if ($widest === null || count($card['links']) > count($cards[$widest]['links'])) {
+                $widest = $index;
+            }
+        }
+        foreach ($cards as $index => $card) {
+            $cards[$index]['wide'] = $index === $widest;
         }
 
         return $cards;

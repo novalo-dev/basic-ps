@@ -17,11 +17,6 @@
         <target state="translated">Configura tu tienda en unos clics</target>
         <note>Line: </note>
       </trans-unit>
-      <trans-unit id="bf17ac149e2e7a530c677e9bd51d3fd2">
-        <source>Modules</source>
-        <target state="translated">Módulos</target>
-        <note>Line: </note>
-      </trans-unit>
       <trans-unit id="6ed87c3e5573bcbf7ea8026c07273b44">
         <source>Choose the module pages shown in the menu.</source>
         <target state="translated">Elige las páginas de módulos que se muestran en el menú.</target>

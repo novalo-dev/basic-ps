@@ -669,7 +669,7 @@ if (signedIn) {
     await check('the settings page', async () => {
         await open(settingsUrl);
         await page.locator('#peb-settings').waitFor({ state: 'attached', timeout: 30000 });
-        const titles = await page.evaluate(() => [...document.querySelectorAll('#peb-settings .peb-card:not([data-class-name]) [data-test$="-block"]')]
+        const titles = await page.evaluate(() => [...document.querySelectorAll('#peb-settings [data-peb-view="home"] [data-test$="-block"]')]
             .map((block) => block.getAttribute('data-test'))
             .filter((test) => test !== 'title-block' && test !== 'description-block')
             .map((test) => test.replace(/-block$/, '')));
@@ -678,6 +678,23 @@ if (signedIn) {
         }
         await view('4-settings-page');
         await lookChecks();
+
+        // A section opens on its pages in place, after the waiting cards, and the
+        // button at the bottom goes back to the sections.
+        const before = page.url().replace(/#.*$/, '');
+        await page.locator('#peb-settings [data-peb-open^="section-"]').first().click();
+        await page.locator('#peb-settings [data-peb-view^="section-"]:not([hidden])').waitFor({ state: 'visible', timeout: 5000 });
+        if (page.url().replace(/#.*$/, '') !== before) {
+            throw new Error('opening a section left the page');
+        }
+        const pages = await page.locator('#peb-settings [data-peb-view^="section-"]:not([hidden]) a[href]').count();
+        if (pages === 0) {
+            throw new Error('a section opened on no page');
+        }
+        await view('4-settings-section');
+        await lookChecks();
+        await page.locator('#peb-settings [data-peb-back]').click();
+        await page.locator('#peb-settings [data-peb-view="home"]:not([hidden])').waitFor({ state: 'visible', timeout: 5000 });
     });
 
     // The help blocks of PrestaShop's original homepage, links only.
@@ -701,29 +718,20 @@ if (signedIn) {
             console.log('no module page on this shop: nothing to switch');
             return;
         }
-        // A card whose module has pages of its own opens on their links in place.
-        const opening = page.locator('#peb-menu-modules .peb-card__header[aria-expanded]').first();
-        if (await opening.count() > 0) {
-            const before = page.url();
-            await opening.click();
-            const pages = opening.locator('xpath=ancestor::*[@data-class-name]').locator('.peb-card__pages a').first();
-            if (page.url() !== before || !await pages.isVisible() || (await pages.boundingBox()).height === 0) {
-                throw new Error('a module card with pages does not open on them');
-            }
-            await opening.click();
-        }
+        // The module pages are a view of their own, opened from their section card.
+        await page.locator('#peb-settings [data-peb-open="modules"]').click();
+        await page.locator('#peb-menu-modules:not([hidden])').waitFor({ state: 'visible', timeout: 5000 });
 
         const card = cards.first();
-        const name = (await card.locator('h1').innerText()).trim();
+        const name = (await card.locator('.peb-settings__name').innerText()).trim();
         // An entry with sub-pages also holds its arrow icon's name: matched by inclusion.
         const inMenu = async () => page.evaluate((label) => [...document.querySelectorAll('#peb-side-bar .peb-side-bar__label')]
             .some((entry) => entry.textContent.replace(/\s+/g, ' ').includes(label)), name);
         if (await inMenu()) {
             throw new Error(`${name} is in the menu before its switch is on`);
         }
-        const toggle = card.locator('[role="switch"]');
-        await toggle.click();
-        await page.waitForFunction((el) => el.getAttribute('aria-checked') === 'true' && !el.hasAttribute('aria-busy'), await toggle.elementHandle(), { timeout: 30000 });
+        await card.locator('.peb-settings__switch').click();
+        await page.waitForFunction((el) => el.querySelector('input[value="1"]').checked && !el.hasAttribute('aria-busy'), await card.elementHandle(), { timeout: 30000 });
         await page.reload({ waitUntil: 'load' });
         await page.waitForFunction(menuReady, null, { timeout: 30000 });
         if (!await inMenu()) {
@@ -778,7 +786,7 @@ if (signedIn && browserName === 'chromium') {
             }
             await small.goto(settings, { waitUntil: 'load' });
             await small.locator('#peb-settings').waitFor({ state: 'attached', timeout: 30000 });
-            const overflow = await small.evaluate(() => [...document.querySelectorAll('#peb-settings .puik-card')]
+            const overflow = await small.evaluate(() => [...document.querySelectorAll('#peb-settings .card')]
                 .filter((card) => card.getBoundingClientRect().right > innerWidth + 1).length);
             if (overflow > 0) {
                 throw new Error(`${overflow} settings card(s) wider than the screen`);
