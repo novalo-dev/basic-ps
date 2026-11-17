@@ -217,7 +217,10 @@ const scrollingBoxes = () => {
     return JSON.stringify([...all]
         .filter((element) => {
             const style = getComputedStyle(element);
-            return element.getBoundingClientRect().height > 0 && /(auto|scroll|hidden|clip)/.test(style.overflowY) && element.scrollHeight > element.clientHeight + 1;
+            // A frame scrolls its own document, which this page cannot measure:
+            // it is listed with its size and rules whatever it holds.
+            return element.getBoundingClientRect().height > 0 && (element.tagName === 'IFRAME'
+                || (/(auto|scroll|hidden|clip)/.test(style.overflowY) && element.scrollHeight > element.clientHeight + 1));
         })
         .sort((a, b) => b.scrollHeight - b.clientHeight - (a.scrollHeight - a.clientHeight))
         .slice(0, 8)
@@ -227,8 +230,12 @@ const scrollingBoxes = () => {
                 chain.unshift(name(node));
             }
             const style = getComputedStyle(element);
+            const box = element.getBoundingClientRect();
             return {
                 box: chain.join(' > '),
+                top: Math.round(box.top),
+                bottom: Math.round(box.bottom),
+                src: (element.getAttribute('src') || '').slice(0, 80),
                 client: element.clientHeight,
                 scroll: element.scrollHeight,
                 height: style.height,
