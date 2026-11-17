@@ -158,8 +158,8 @@ body:not(.display-modal) #content:is(.bootstrap, .nobootstrap) > .bootstrap:has(
 
 /*
  * Under the PrestaShop 9 stylesheets the side bar shows the browser's full-width
- * scrollbar. Kept thin, as the PrestaShop 8 overlay scrollbar was, and widened
- * while the pointer is over the menu so it stays easy to grab.
+ * scrollbar. Kept thin, as the PrestaShop 8 overlay scrollbar was, hidden until
+ * the pointer is over the menu, and widened then so it stays easy to grab.
  */
 @supports selector(::-webkit-scrollbar) {
   .nav-bar::-webkit-scrollbar {
@@ -175,8 +175,12 @@ body:not(.display-modal) #content:is(.bootstrap, .nobootstrap) > .bootstrap:has(
   }
 
   .nav-bar::-webkit-scrollbar-thumb {
-    background: rgba(29, 29, 27, .3);
+    background: transparent;
     border-radius: 4px;
+  }
+
+  .nav-bar:hover::-webkit-scrollbar-thumb {
+    background: rgba(29, 29, 27, .3);
   }
 
   .nav-bar::-webkit-scrollbar-thumb:hover {
@@ -188,6 +192,11 @@ body:not(.display-modal) #content:is(.bootstrap, .nobootstrap) > .bootstrap:has(
 @supports not selector(::-webkit-scrollbar) {
   .nav-bar {
     scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+
+  .nav-bar:hover {
+    scrollbar-color: rgba(29, 29, 27, .3) transparent;
   }
 }
 

@@ -157,7 +157,7 @@
  * Octopia" holds on one line; the page content follows the same variable.
  */
 :root {
-  --cdk-sidebar-width: 15rem;
+  --cdk-sidebar-width: 17rem;
 }
 
 body:not(.mobile) .nav-bar:not(.collapsed) {
