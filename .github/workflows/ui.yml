@@ -126,7 +126,7 @@ jobs:
         working-directory: module/dev/ui-tests
         env:
           # The views go to the log on a manual run only: they make it long.
-          PRINT_VIEWS: ${{ github.event_name == 'workflow_dispatch' && matrix.major == '9' && '1' || '' }}
+          PRINT_VIEWS: ${{ github.event_name == 'workflow_dispatch' && '1' || '' }}
         run: |
           node sanity.mjs "http://localhost:8080/$ADMIN_DIR/" "$ADMIN_MAIL" "$ADMIN_PASSWD" ${{ matrix.browser }} \
             "$GITHUB_WORKSPACE/ui-shots" ${{ matrix.major }} "$GITHUB_WORKSPACE/ui-results.txt"

@@ -63,7 +63,7 @@ const check = async (name, run) => {
 };
 
 // Views of the back office kept with the run, to look at the result rather than
-// only read it. On a manual run of a PrestaShop 9 shop they are also written to
+// only read it. On a manual run they are also written to
 // the log, which can be read where the run's files cannot be downloaded.
 const view = async (name) => {
     await page.waitForTimeout(1500);
