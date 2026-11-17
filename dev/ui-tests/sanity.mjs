@@ -243,6 +243,15 @@ const scrollingBoxes = () => {
                 overflowY: style.overflowY,
                 inline: element.getAttribute('style') || '',
                 rules: rules(element),
+                // A frame at 100% takes its height from a parent: each one up
+                // to the page content, with what sizes it.
+                parents: element.tagName !== 'IFRAME' ? [] : (() => {
+                    const list = [];
+                    for (let node = element.parentElement; node && node.id !== 'content' && list.length < 5; node = node.parentElement) {
+                        list.push({ box: name(node), height: getComputedStyle(node).height, inline: node.getAttribute('style') || '', rules: rules(node) });
+                    }
+                    return list;
+                })(),
             };
         }));
 };
