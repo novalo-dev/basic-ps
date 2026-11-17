@@ -44,16 +44,45 @@
 }
 
 /*
- * Legacy pages started their first block 3px under the page header (7px under the
- * tabs when they have some), against 16px on Symfony pages: both get the same space.
- * Pages shown in a modal have no page header and keep their own padding.
+ * The page header of legacy pages is fixed in the PrestaShop 9 stylesheet, and the
+ * page reserves a set height for it. On PrestaShop 8 that header is taller as soon
+ * as a module adds a subtitle or its toolbar wraps, and it then covered the top of
+ * the page. It is placed in the page instead and kept at the top while scrolling,
+ * as PrestaShop 9 does with the toolbar of its own pages: it takes its real height
+ * and the first block always starts 16px under it. Pages shown in a modal have no
+ * page header and keep their own padding.
  */
-body:not(.display-modal) #content.bootstrap {
-  padding-top: calc(var(--cdk-page-head-height) + .8125rem);
+body:not(.display-modal) #content.bootstrap,
+body:not(.display-modal) #content.bootstrap.with-tabs {
+  padding-top: 0;
 }
 
-body:not(.display-modal) #content.bootstrap.with-tabs {
-  padding-top: calc(var(--cdk-page-head-with-tabs-height) + .625rem);
+body:not(.display-modal) #content.bootstrap > .bootstrap:has(> .page-head) {
+  position: sticky;
+  top: var(--cdk-header-height);
+  z-index: 499;
+  margin: 0 calc(-1 * var(--cdk-size-16)) var(--cdk-size-16) calc(-1 * (var(--cdk-sidebar-width) + var(--cdk-size-16)));
+}
+
+.page-sidebar-closed:not(.mobile) #content.bootstrap > .bootstrap:has(> .page-head) {
+  margin-left: calc(-1 * (var(--cdk-sidebar-width-collapse) + var(--cdk-size-16)));
+}
+
+.mobile #content.bootstrap > .bootstrap:has(> .page-head) {
+  margin-left: calc(-1 * var(--cdk-size-16));
+}
+
+body:not(.display-modal) #content.bootstrap > .bootstrap > .page-head {
+  position: relative;
+  top: auto;
+  left: auto;
+  width: auto;
+}
+
+/* A module's configuration page draws the module manager's header, then its own
+   over it: only the module's shows, as when both were fixed. */
+body:not(.display-modal) #content.bootstrap > .bootstrap:has(> .page-head):has(~ .bootstrap > .page-head) {
+  display: none;
 }
 
 /*
@@ -102,31 +131,36 @@ body:not(.display-modal) #content.bootstrap.with-tabs {
 }
 
 /*
- * PrestaShop 8 templates draw secondary actions (Configure and Upgrade in the
- * module manager, a payment module's Configure, a currency's Reset) as
- * btn-primary-reverse btn-outline-primary. PrestaShop 9 templates switched those
- * to btn-outline-secondary, and its stylesheet now fills btn-outline-primary in
- * grey, so these buttons get the white outlined look PrestaShop 9 shows there.
+ * PrestaShop 8 templates and the modules written for them draw secondary actions
+ * (Configure and Upgrade in the module manager, Add a feature on a product, a
+ * module's own buttons) as btn-outline-primary. PrestaShop 9 templates switched
+ * those to btn-outline-secondary, and its stylesheet fills btn-outline-primary in
+ * grey, so every such button gets the white outlined look PrestaShop 9 gives
+ * btn-outline-secondary.
  */
-.btn-outline-primary.btn-primary-reverse,
-.module-actions .btn-outline-primary,
-.btn-outline-primary.card-currency-reset {
+.btn-outline-primary {
+  color: var(--cdk-primary-800, #1d1d1b);
   background-color: var(--cdk-white, #fff);
+  border: 1px solid var(--cdk-primary-800, #1d1d1b);
 }
 
-.btn-outline-primary.btn-primary-reverse:hover,
-.module-actions .btn-outline-primary:hover,
-.btn-outline-primary.card-currency-reset:hover {
+.btn-outline-primary:hover {
+  color: var(--cdk-primary-800, #1d1d1b);
   background-color: var(--cdk-primary-300, #eee);
+  border-color: var(--cdk-primary-800, #1d1d1b);
 }
 
-.btn-outline-primary.btn-primary-reverse:focus,
-.btn-outline-primary.btn-primary-reverse:active,
-.module-actions .btn-outline-primary:focus,
-.module-actions .btn-outline-primary:active,
-.btn-outline-primary.card-currency-reset:focus,
-.btn-outline-primary.card-currency-reset:active {
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+  color: var(--cdk-primary-800, #1d1d1b);
   background-color: var(--cdk-primary-400, #ddd);
+}
+
+.btn-outline-primary.disabled,
+.btn-outline-primary:disabled {
+  color: var(--cdk-primary-500, #bbb);
+  background-color: var(--cdk-primary-200, #f7f7f7);
+  border-color: var(--cdk-primary-200, #f7f7f7);
 }
 
 /* On a phone or a tablet, PrestaShop 8 hooks perfect-scrollbar onto the menu,

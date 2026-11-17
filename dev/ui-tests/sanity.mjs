@@ -185,9 +185,10 @@ const lookChecks = async () => {
             .filter((icon) => icon.offsetParent && icon.children.length === 0
                 && icon.getBoundingClientRect().width > parseFloat(getComputedStyle(icon).fontSize) * 1.6)
             .map((icon) => icon.textContent.trim());
-        const head = document.querySelector('#content.bootstrap .page-head');
+        // A module's configuration page has two page headers, only the last shown.
+        const head = [...document.querySelectorAll('#content.bootstrap .page-head')].filter((element) => element.getBoundingClientRect().height > 0).pop();
         let gap = null;
-        if (head && getComputedStyle(head).position === 'fixed' && !document.body.classList.contains('display-modal')) {
+        if (head && !document.body.classList.contains('display-modal')) {
             const bottom = head.getBoundingClientRect().bottom;
             const blocks = [...document.querySelectorAll('#content.bootstrap .panel, #content.bootstrap .alert, #content.bootstrap form, #content.bootstrap .row')]
                 .filter((block) => !block.closest('.page-head') && block.getBoundingClientRect().height > 10)
@@ -204,19 +205,45 @@ const lookChecks = async () => {
             const style = getComputedStyle(element);
             return box.width > 0 && box.height > 0 && style.visibility !== 'hidden' && parseFloat(style.opacity) > 0.05;
         };
+        // The top of everything painted in the page (text, field, image, background,
+        // border), not only the middle of a text: a block whose top edge slips under
+        // the header is caught too.
         const header = [...document.querySelectorAll('.header-toolbar, .page-head, .main-header, #header')]
-            .filter((element) => shown(element) && getComputedStyle(element).position === 'fixed');
+            .filter((element) => shown(element) && ['fixed', 'sticky'].includes(getComputedStyle(element.closest('.bootstrap:has(> .page-head)') || element).position));
         const headerBottom = Math.max(0, ...header.map((element) => element.getBoundingClientRect().bottom));
         const covered = [];
-        for (const element of document.querySelectorAll('#main-div a, #main-div button, #main-div h1, #main-div h2, #main-div h3, #main-div h4, #main-div label, #main-div p, #main-div input, #content a, #content button, #content h2, #content h3, #content label, #content p, #content input')) {
-            if (covered.length > 4 || !shown(element) || element.closest('.header-toolbar, .page-head, .main-header, #header, .nav-bar, .modal, .dropdown-menu, [role="dialog"]')) {
+        const area = document.querySelector('.content-div') || document.querySelector('#content');
+        for (const element of area ? area.querySelectorAll('*') : []) {
+            if (covered.length > 4 || !shown(element) || element.closest('.header-toolbar, .page-head, .main-header, #header, .nav-bar, .modal, .dropdown-menu, [role="dialog"], .growl, #ajax_confirmation, script, style')) {
                 continue;
             }
+            // The help panel and other fixed layers slide in from outside the page.
+            let layer = false;
+            for (let node = element; node && node !== area; node = node.parentElement) {
+                if (getComputedStyle(node).position === 'fixed') {
+                    layer = true;
+                    break;
+                }
+            }
             const box = element.getBoundingClientRect();
-            if (box.top + box.height / 2 < headerBottom - 2 && box.bottom > 0 && (element.textContent.trim() || element.tagName === 'INPUT')) {
-                covered.push(`${element.tagName.toLowerCase()} "${element.textContent.trim().slice(0, 30)}"`);
+            if (layer || box.left >= innerWidth || box.right <= 0 || box.bottom <= 0) {
+                continue;
+            }
+            const style = getComputedStyle(element);
+            const painted = [...element.childNodes].some((node) => node.nodeType === 3 && node.textContent.trim())
+                || ['IMG', 'INPUT', 'SELECT', 'TEXTAREA', 'BUTTON', 'svg', 'CANVAS', 'IFRAME'].includes(element.tagName)
+                || !['rgba(0, 0, 0, 0)', 'transparent'].includes(style.backgroundColor)
+                || parseFloat(style.borderTopWidth) > 0;
+            if (painted && box.top < headerBottom - 1) {
+                covered.push(`${element.tagName.toLowerCase()} "${element.textContent.trim().slice(0, 30)}" (${Math.round(headerBottom - box.top)}px)`);
             }
         }
+        // PrestaShop 9 fills btn-outline-primary in grey; PrestaShop 8 secondary
+        // actions use it and must stay white, as btn-outline-secondary in 9.
+        const grey = [...document.querySelectorAll('.btn-outline-primary')]
+            .filter((button) => shown(button) && !button.matches(':hover, :focus, :active') && !button.disabled && !button.classList.contains('disabled')
+                && getComputedStyle(button).backgroundColor !== 'rgb(255, 255, 255)')
+            .map((button) => `"${button.textContent.trim().slice(0, 30)}"`);
         const rgb = (value) => (value.match(/[\d.]+/g) || []).map(Number);
         const luminance = ([r, g, b]) => [r, g, b].map((c) => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; })
             .reduce((sum, c, i) => sum + c * [0.2126, 0.7152, 0.0722][i], 0);
@@ -249,7 +276,7 @@ const lookChecks = async () => {
                 invisible.push(`"${text.textContent.trim().slice(0, 30)}"`);
             }
         }
-        return { sheets, notice: notice ? getComputedStyle(notice).display : 'none', wordIcons, gap, covered, invisible };
+        return { sheets, notice: notice ? getComputedStyle(notice).display : 'none', wordIcons, gap, covered, invisible, grey };
     });
     const clashes = [
         ...state.covered.map((what) => `under the header: ${what}`),
@@ -276,6 +303,9 @@ const lookChecks = async () => {
         }
         if (state.gap !== null && state.gap < 8) {
             throw new Error(`the first block starts ${state.gap}px under the page header`);
+        }
+        if (state.grey.length > 0) {
+            throw new Error(`secondary buttons filled in grey: ${state.grey.join(', ')}`);
         }
         if (clashes.length > 0) {
             throw new Error(clashes.join('; '));
