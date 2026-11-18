@@ -104,8 +104,8 @@ jobs:
 
       - name: Install the module
         run: |
-          # The same folder Build for Testing zips.
-          module/dev/package/build.sh "$RUNNER_TEMP/pack"
+          # The same folder Build for Testing zips, for this PrestaShop version.
+          module/dev/package/build.sh "$RUNNER_TEMP/pack" "${{ matrix.major }}"
           docker cp "$RUNNER_TEMP/pack/ps_edition_basic" shop:/var/www/html/modules/ps_edition_basic
           docker exec shop chown -R www-data:www-data /var/www/html/modules/ps_edition_basic
           set -o pipefail

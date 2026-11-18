@@ -22,13 +22,19 @@ jobs:
       - name: Build
         id: build
         run: |
-          dev/package/build.sh "$RUNNER_TEMP/pack"
+          dev/package/build.sh "$RUNNER_TEMP/pack8" 8
+          dev/package/build.sh "$RUNNER_TEMP/pack9" 9
           VERSION=$(sed -n "s#.*\$this->version = '\(.*\)';.*#\1#p" ps_edition_basic.php)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
       # The artifact is the folder: GitHub zips it on download, with
       # ps_edition_basic/ at the root, as the module upload expects.
       - uses: actions/upload-artifact@v4
         with:
-          name: ps_edition_basic-${{ steps.build.outputs.version }}
-          path: ${{ runner.temp }}/pack
+          name: ps_edition_basic-${{ steps.build.outputs.version }}-ps8
+          path: ${{ runner.temp }}/pack8
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ps_edition_basic-${{ steps.build.outputs.version }}-ps9
+          path: ${{ runner.temp }}/pack9
           retention-days: 14

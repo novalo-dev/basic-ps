@@ -58,11 +58,18 @@ receive the notifications.
 
 ## Getting a build
 
-There are no official releases. Two ways to get the zip, a folder `ps_edition_basic/`
-at its root, ready to upload in *Modules → Module Manager → Upload a module*:
+There are no official releases. Each build comes as two zips, each with a folder
+`ps_edition_basic/` at its root, ready to upload in *Modules → Module Manager →
+Upload a module*:
 
-- **Actions → Build for Testing → Run workflow**, then download the artifact;
-- **Actions → Pre-release → Run workflow** publishes it as a GitHub pre-release,
+- **ps8**: the whole module. It runs on PrestaShop 8 and 9.
+- **ps9**: without what only PrestaShop 8 uses to look like PrestaShop 9 (the copied
+  PrestaShop 9 stylesheets, most of the weight), and PrestaShop refuses it below 9.0.
+
+Two ways to get them:
+
+- **Actions → Build for Testing → Run workflow**, then download the two artifacts;
+- **Actions → Pre-release → Run workflow** publishes both as a GitHub pre-release,
   tagged with the version of `config.xml`; a version already published is refused.
 
 ## Versions

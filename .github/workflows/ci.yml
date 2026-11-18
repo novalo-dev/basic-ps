@@ -145,6 +145,14 @@ jobs:
         run: php .github/scripts/check-headers.php .
       - name: Build the module folder
         run: dev/package/build.sh "$RUNNER_TEMP/pack"
+      - name: The PrestaShop 9 folder leaves out what only PrestaShop 8 uses
+        run: |
+          dev/package/build.sh "$RUNNER_TEMP/pack9" 9
+          cd "$RUNNER_TEMP/pack9/ps_edition_basic"
+          [ ! -e views/ps9 ] || { echo "::error::views/ps9 is in the PrestaShop 9 folder"; exit 1; }
+          grep -q "'min' => '9.0.0'" ps_edition_basic.php || { echo "::error::the PrestaShop 9 folder does not ask for PrestaShop 9"; exit 1; }
+          MISSING=$(find . -type d ! -exec test -e '{}/index.php' ';' -print)
+          [ -z "$MISSING" ] || { echo "$MISSING" | sed 's/^/::error::index.php missing in /'; exit 1; }
       - name: index.php in every folder, nothing from the dev folders
         run: |
           cd "$RUNNER_TEMP/pack/ps_edition_basic"

@@ -1,6 +1,7 @@
 name: Pre-release
 
-# Publishes the module zip as a GitHub pre-release, for testing on a shop: an
+# Publishes the module zips, one for PrestaShop 8 and one for PrestaShop 9, as a
+# GitHub pre-release, for testing on a shop: an
 # unofficial build, marked as such. Run by hand from the Actions tab on the
 # branch to publish; the tag is the version in config.xml, so a version already
 # published is refused rather than replaced.
@@ -46,14 +47,21 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          dev/package/build.sh "$RUNNER_TEMP/pack"
-          cd "$RUNNER_TEMP/pack"
-          zip -qr "$RUNNER_TEMP/ps_edition_basic-$VERSION.zip" ps_edition_basic
-          # The zip a shop uploads: the module folder at its root, no plumbing.
-          unzip -l "$RUNNER_TEMP/ps_edition_basic-$VERSION.zip" | grep -q ' ps_edition_basic/ps_edition_basic.php$' \
-            || { echo "::error::The module is missing from the zip"; exit 1; }
-          if unzip -l "$RUNNER_TEMP/ps_edition_basic-$VERSION.zip" | grep -qE ' ps_edition_basic/(\.github|dev)/'; then
-            echo "::error::The zip carries the repository's plumbing"; exit 1
+          # One zip per PrestaShop version: the PrestaShop 9 one leaves out what
+          # only PrestaShop 8 uses (see dev/package/build.sh).
+          for TARGET in 8 9; do
+            ZIP="$RUNNER_TEMP/ps_edition_basic-$VERSION-ps$TARGET.zip"
+            dev/package/build.sh "$RUNNER_TEMP/pack$TARGET" "$TARGET"
+            (cd "$RUNNER_TEMP/pack$TARGET" && zip -qr "$ZIP" ps_edition_basic)
+            # The zip a shop uploads: the module folder at its root, no plumbing.
+            unzip -l "$ZIP" | grep -q ' ps_edition_basic/ps_edition_basic.php$' \
+              || { echo "::error::The module is missing from the PrestaShop $TARGET zip"; exit 1; }
+            if unzip -l "$ZIP" | grep -qE ' ps_edition_basic/(\.github|dev)/'; then
+              echo "::error::The PrestaShop $TARGET zip carries the repository's plumbing"; exit 1
+            fi
+          done
+          if unzip -l "$RUNNER_TEMP/ps_edition_basic-$VERSION-ps9.zip" | grep -q ' ps_edition_basic/views/ps9/'; then
+            echo "::error::The PrestaShop 9 zip carries the PrestaShop 8 stylesheets"; exit 1
           fi
       - name: Publish
         env:
@@ -61,7 +69,7 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
           NOTES: ${{ inputs.notes }}
         run: |
-          set -- "v$VERSION" "$RUNNER_TEMP/ps_edition_basic-$VERSION.zip" \
+          set -- "v$VERSION" "$RUNNER_TEMP/ps_edition_basic-$VERSION-ps8.zip" "$RUNNER_TEMP/ps_edition_basic-$VERSION-ps9.zip" \
             --target "$GITHUB_SHA" --prerelease --title "$VERSION (pre-release)"
           if [ -n "$NOTES" ]; then
             gh release create "$@" --notes "$NOTES"
