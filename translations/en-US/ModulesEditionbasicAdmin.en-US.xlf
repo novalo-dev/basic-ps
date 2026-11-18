@@ -407,6 +407,11 @@
         <target state="translated">%customer%: %message%</target>
         <note>Line: </note>
       </trans-unit>
+      <trans-unit id="9f099595077afc90c594eba23bd43a3d">
+        <source>To unblock them, click the padlock at the left of the address, set Notifications to Allow, then reload the page.</source>
+        <target state="translated">To unblock them, click the padlock at the left of the address, set Notifications to Allow, then reload the page.</target>
+        <note>Line: </note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

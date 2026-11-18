@@ -163,7 +163,9 @@
     };
     var state = function (name, subscribed) {
       status.textContent = text(name);
-      buttons.on.hidden = name !== 'off';
+      // Shown when blocked too: a missing button left the merchant with no way
+      // forward, while the click explains how to unblock the site.
+      buttons.on.hidden = name !== 'off' && name !== 'denied';
       buttons.off.hidden = !subscribed;
       buttons.test.hidden = !subscribed;
     };
@@ -217,7 +219,13 @@
       busy(true);
       Notification.requestPermission().then(function (permission) {
         if (permission !== 'granted') {
-          return refresh();
+          // A browser never asks again a site it blocked: only its own
+          // settings unblock it, which the card now explains.
+          return refresh().then(function () {
+            if (Notification.permission === 'denied') {
+              status.textContent = text('unblock');
+            }
+          });
         }
         return registration.then(function (worker) {
           return worker.pushManager.subscribe({

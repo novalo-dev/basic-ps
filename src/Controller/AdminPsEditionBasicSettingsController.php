@@ -110,6 +110,7 @@ class AdminPsEditionBasicSettingsController extends AdminPsEditionBasicControlle
                 'on' => $this->translate('This browser receives the notifications, even with the back office closed.'),
                 'off' => $this->translate('Turn them on to be told about new orders, customers and messages, even with the back office closed.'),
                 'denied' => $this->translate('Notifications are blocked for this site. Allow them in the browser settings, then reload the page.'),
+                'unblock' => $this->translate('To unblock them, click the padlock at the left of the address, set Notifications to Allow, then reload the page.'),
                 'unsupported' => $this->translate('This browser cannot receive notifications. On iPhone and iPad, add the back office to the home screen first.'),
                 'insecure' => $this->translate('Notifications need the back office to open on a secure address (https).'),
                 'noServer' => $this->translate('This server cannot send notifications: PHP needs its OpenSSL and cURL extensions.'),
