@@ -2,6 +2,7 @@
 
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
+ * Modifications copyright since 2026 Novalo
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
  *
  * NOTICE OF LICENSE
@@ -15,7 +16,9 @@
  * to license@prestashop.com so we can send you a copy immediately.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
+ * @author    Novalo <ouanis.m@novalo.fr>
  * @copyright Since 2007 PrestaShop SA and Contributors
+ * @copyright Since 2026 Novalo, for its modifications
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  */
 

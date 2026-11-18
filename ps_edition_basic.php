@@ -1,6 +1,7 @@
 <?php
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
+ * Modifications copyright since 2026 Novalo
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
  *
  * NOTICE OF LICENSE
@@ -14,7 +15,9 @@
  * to license@prestashop.com so we can send you a copy immediately.
  *
  * @author    PrestaShop SA and Contributors <contact@prestashop.com>
+ * @author    Novalo <ouanis.m@novalo.fr>
  * @copyright Since 2007 PrestaShop SA and Contributors
+ * @copyright Since 2026 Novalo, for its modifications
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
  */
 
@@ -44,7 +47,7 @@ class ps_edition_basic extends Module
     public function __construct()
     {
         $this->name = 'ps_edition_basic';
-        $this->version = '1.3.9';
+        $this->version = '1.4.0';
         $this->tab = 'administration';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
