@@ -46,7 +46,7 @@ class Notifier
     /** @var array<int, string> */
     private static $locales = [];
 
-    /** @var array<string, \Symfony\Contracts\Translation\TranslatorInterface|\Symfony\Component\Translation\TranslatorInterface> */
+    /** @var array<string, \PrestaShopBundle\Translation\TranslatorComponent> */
     private static $translators = [];
 
     public static function orderPlaced(\Order $order): void
@@ -309,10 +309,8 @@ class Notifier
     /**
      * A translator for the employee's language: the one of the request only
      * holds the visitor's, and in the shop it leaves out the back office texts.
-     *
-     * @return \Symfony\Contracts\Translation\TranslatorInterface|\Symfony\Component\Translation\TranslatorInterface
      */
-    private static function translator(string $locale)
+    private static function translator(string $locale): \PrestaShopBundle\Translation\TranslatorComponent
     {
         if (!isset(self::$translators[$locale])) {
             self::$translators[$locale] = \Context::getContext()->getTranslatorFromLocale($locale);
