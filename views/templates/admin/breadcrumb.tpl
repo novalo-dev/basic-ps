@@ -24,7 +24,7 @@
  *}
 <div id="wrapper_breadcrumb">
     <div id="content_breadcrumb">
-        <div class="puik-style peb-breadcrumb">
+        <div class="peb-style peb-breadcrumb">
             <div class="flex items-center">
                 {foreach $peb_breadcrumb as $item name=crumbs}
                     <div class="flex items-center">

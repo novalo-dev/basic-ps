@@ -31,7 +31,7 @@
   </span>
 
   <div class="nav-bar-overflow">
-    <div id="peb-side-bar" class="side-bar puik-style{if $collapse_menu != 0} peb-collapsed{/if}">
+    <div id="peb-side-bar" class="side-bar peb-style{if $collapse_menu != 0} peb-collapsed{/if}">
       <div class="text-[#363a41] pb-4 sm:pb-16">
         <div class="bg-[#F7F7F7] p-1.5 hidden lg:flex justify-end peb-side-bar__header">
           <button type="button" class="puik-button puik-button--text puik-button--sm puik-button--no-wrap transition-none p-1 h-7 flex items-center peb-side-bar__collapse" style="box-shadow: none;">
