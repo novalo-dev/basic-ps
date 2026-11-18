@@ -49,7 +49,9 @@ class TabsInstaller
             }
 
             $tab = new \Tab($tabId);
-            $tab->id_parent = $tabItem['parent'] ? \Tab::getIdFromClassName($tabItem['parent']) : 0;
+            // No parent: a page reached by its link only, outside the menu, as
+            // PrestaShop files its own hidden pages.
+            $tab->id_parent = $tabItem['parent'] ? \Tab::getIdFromClassName($tabItem['parent']) : -1;
             $tab->class_name = $tabItem['class_name'];
             $tab->route_name = $tabItem['route_name'];
             $tab->icon = $tabItem['icon'];

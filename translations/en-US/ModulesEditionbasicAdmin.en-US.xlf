@@ -217,6 +217,196 @@
         <target state="translated">Configure your modules in a few clicks</target>
         <note>Line: </note>
       </trans-unit>
+      <trans-unit id="a274f4d4670213a9045ce258c6c56b80">
+        <source>Notifications</source>
+        <target state="translated">Notifications</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d23c192184b17c12876c0201e5aa63ba">
+        <source>Be told about new orders, customers and messages</source>
+        <target state="translated">Be told about new orders, customers and messages</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="7e75e72489a05a61908fc7b43d7363d7">
+        <source>Notifications on this browser</source>
+        <target state="translated">Notifications on this browser</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="adec73a007fa87daa8d0710edf156937">
+        <source>This browser receives the notifications, even with the back office closed.</source>
+        <target state="translated">This browser receives the notifications, even with the back office closed.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="180f32979d5e4041658c1522da30ffc4">
+        <source>Turn them on to be told about new orders, customers and messages, even with the back office closed.</source>
+        <target state="translated">Turn them on to be told about new orders, customers and messages, even with the back office closed.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="2ecbefb08c1fb7c7a9ed6892e0588b77">
+        <source>Notifications are blocked for this site. Allow them in the browser settings, then reload the page.</source>
+        <target state="translated">Notifications are blocked for this site. Allow them in the browser settings, then reload the page.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="6c0e4254da00408d346af3ad05b66ba1">
+        <source>This browser cannot receive notifications. On iPhone and iPad, add the back office to the home screen first.</source>
+        <target state="translated">This browser cannot receive notifications. On iPhone and iPad, add the back office to the home screen first.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="3a8f8d59015bd9cf818ea51098b65248">
+        <source>Notifications need the back office to open on a secure address (https).</source>
+        <target state="translated">Notifications need the back office to open on a secure address (https).</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="056374077e9922e339541e9cb422cb71">
+        <source>This server cannot send notifications: PHP needs its OpenSSL and cURL extensions.</source>
+        <target state="translated">This server cannot send notifications: PHP needs its OpenSSL and cURL extensions.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d154a5ff03bd9ccd568018f5e51d00cb">
+        <source>Turn on</source>
+        <target state="translated">Turn on</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="8e61d99ca246955cc31b67a365b2a216">
+        <source>Turn off</source>
+        <target state="translated">Turn off</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="8ef55b18d7e8d48a45c62c209d35d3cb">
+        <source>Send a test</source>
+        <target state="translated">Send a test</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="1ebe8c629a3cfc24a3ace5a9a891e986">
+        <source>Test sent: it shows in a few seconds.</source>
+        <target state="translated">Test sent: it shows in a few seconds.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="62805861172db144644d6c30adc270db">
+        <source>The test could not be sent. Turn the notifications off and on again.</source>
+        <target state="translated">The test could not be sent. Turn the notifications off and on again.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="018d963f1c49025140a70dac3b430a19">
+        <source>Notification settings</source>
+        <target state="translated">Notification settings</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="4648ba49ede2150988b2ed5c5731f36c">
+        <source>What you are told about, the badge colors and how long a notification waits</source>
+        <target state="translated">What you are told about, the badge colors and how long a notification waits</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="39f955a983e02682aeecdf0c94854c9b">
+        <source>New orders</source>
+        <target state="translated">New orders</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="5dc5aba5187b03594ed0512efb6a8d4f">
+        <source>New customers</source>
+        <target state="translated">New customers</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="f08d50397194b8e1679b11fd16f60ebc">
+        <source>New messages</source>
+        <target state="translated">New messages</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ee953ab43069fcaff09a0bf6018dfc7d">
+        <source>Counted on the icon of the browser tab, as the bell counts them, and sent as notifications.</source>
+        <target state="translated">Counted on the icon of the browser tab, as the bell counts them, and sent as notifications.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d836b5e952dee5c17b2168ee86ebe8e6">
+        <source>Notification background color</source>
+        <target state="translated">Notification background color</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="edfc54b8273bf6358f53c1bbcfdd8fd0">
+        <source>Notification text color</source>
+        <target state="translated">Notification text color</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b07cc2801693b2e722906a3db3d9c447">
+        <source>Validity</source>
+        <target state="translated">Validity</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b65956127c10ea87acb6ef5c86a33718">
+        <source>How long a notification waits for a browser that is offline. After that, it is dropped.</source>
+        <target state="translated">How long a notification waits for a browser that is offline. After that, it is dropped.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="845560a7d410cf154be3bcfdaad2f858">
+        <source>The settings are saved.</source>
+        <target state="translated">The settings are saved.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="72ab9d0304d3e84c6aa2dd15eda282f2">
+        <source>1 hour</source>
+        <target state="translated">1 hour</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="88f1efb29dc20c4b7c6ae2653b3f778c">
+        <source>6 hours</source>
+        <target state="translated">6 hours</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="a32d6f77b4cd387776263c94eaaa52ff">
+        <source>12 hours</source>
+        <target state="translated">12 hours</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e1f57d0c474bedaae9c88fad138dcfd0">
+        <source>24 hours</source>
+        <target state="translated">24 hours</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="45fe0d3293152fa29cf10ef8a3c1871d">
+        <source>3 days</source>
+        <target state="translated">3 days</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="cb8f14fd3a41cfe1236a3c6b90077ca0">
+        <source>7 days</source>
+        <target state="translated">7 days</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="4820c250a14d770ad4ec3959e2b6e3c1">
+        <source>Notifications are on</source>
+        <target state="translated">Notifications are on</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e501f34850892e0aae53110fd2bb11e3">
+        <source>This browser will tell you about new orders, customers and messages.</source>
+        <target state="translated">This browser will tell you about new orders, customers and messages.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="4c9120f1a5947445c0e9620254ceb30b">
+        <source>New order</source>
+        <target state="translated">New order</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="de4387f0e51708fdd7f3307b2a70d10e">
+        <source>%reference% - %customer% - %total%</source>
+        <target state="translated">%reference% - %customer% - %total%</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d8165ec099ad89c083692dae84567e87">
+        <source>New customer</source>
+        <target state="translated">New customer</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b55a2d6e1009d3881156a3495dd26de5">
+        <source>New message</source>
+        <target state="translated">New message</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="df4ec3d55a28b92e90f5d7d5739a73fb">
+        <source>%customer%: %message%</source>
+        <target state="translated">%customer%: %message%</target>
+        <note>Line: </note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

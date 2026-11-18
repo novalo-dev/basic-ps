@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace PrestaShop\Module\PsEditionBasic\Controller;
 
+use PrestaShop\Module\PsEditionBasic\Helper\EmployeeAccess;
 use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\HttpFoundation\Response;
@@ -83,16 +84,12 @@ abstract class AdminPsEditionBasicController extends FrameworkBundleAdminControl
      */
     protected function granted(string $right): bool
     {
-        $idProfile = (int) $this->legacyContext()->employee->id_profile;
-        // As Tab::checkTabRights(): the SuperAdmin profile holds every right.
-        if ($idProfile === (int) _PS_ADMIN_PROFILE_) {
-            return true;
-        }
         // Each page is the tab of the same name, installed by Tabs::getTabs().
-        $idTab = (int) \Tab::getIdFromClassName((new \ReflectionClass($this))->getShortName());
-        $accesses = \Profile::getProfileAccesses($idProfile);
-
-        return isset($accesses[$idTab][$right]) && (string) $accesses[$idTab][$right] === '1';
+        return EmployeeAccess::granted(
+            (int) $this->legacyContext()->employee->id_profile,
+            (new \ReflectionClass($this))->getShortName(),
+            $right
+        );
     }
 
     public function indexAction(): Response

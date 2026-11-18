@@ -21,3 +21,32 @@ ps_edition_basic_help:
     _controller: PrestaShop\Module\PsEditionBasic\Controller\AdminPsEditionBasicHelpController::indexAction
     _legacy_controller: "AdminPsEditionBasicHelpController"
     _legacy_link: "AdminPsEditionBasicHelpController"
+
+# The Notifications view of the settings page: the same access as the page.
+ps_edition_basic_notifications_save:
+  path: pseditionbasic/notifications
+  methods: [POST]
+  defaults:
+    _controller: PrestaShop\Module\PsEditionBasic\Controller\AdminPsEditionBasicSettingsController::saveNotificationsAction
+    _legacy_controller: "CONFIGURE"
+
+ps_edition_basic_push_subscribe:
+  path: pseditionbasic/notifications/subscribe
+  methods: [POST]
+  defaults:
+    _controller: PrestaShop\Module\PsEditionBasic\Controller\AdminPsEditionBasicSettingsController::subscribeAction
+    _legacy_controller: "CONFIGURE"
+
+ps_edition_basic_push_unsubscribe:
+  path: pseditionbasic/notifications/unsubscribe
+  methods: [POST]
+  defaults:
+    _controller: PrestaShop\Module\PsEditionBasic\Controller\AdminPsEditionBasicSettingsController::unsubscribeAction
+    _legacy_controller: "CONFIGURE"
+
+ps_edition_basic_push_test:
+  path: pseditionbasic/notifications/test
+  methods: [POST]
+  defaults:
+    _controller: PrestaShop\Module\PsEditionBasic\Controller\AdminPsEditionBasicSettingsController::testNotificationAction
+    _legacy_controller: "CONFIGURE"

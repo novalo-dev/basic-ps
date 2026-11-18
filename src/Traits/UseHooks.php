@@ -32,6 +32,9 @@ trait UseHooks
     use Hooks\UseDisplayBackOfficeHeader;
     use Hooks\UseDisplayAdminNavBarBeforeEnd;
     use Hooks\UseDisplayDashboardTop;
+    use Hooks\UseActionValidateOrder;
+    use Hooks\UseActionCustomerAccountAdd;
+    use Hooks\UseActionObjectCustomerMessageAddAfter;
 
     /**
      * @var array An array of method that can be called to register media in the actionAdminControllerSetMedia hook

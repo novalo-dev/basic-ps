@@ -356,3 +356,6 @@
   text-align: center;
   cursor: pointer;
 }
+
+/* The color fields of the notification settings: a swatch, not a text field. */
+.peb-settings__color { width: 4rem; height: 2.25rem; padding: .125rem; cursor: pointer; }

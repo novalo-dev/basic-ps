@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 use PrestaShop\Module\PsEditionBasic\Actions\Uninstall;
 use PrestaShop\Module\PsEditionBasic\Install\Tabs\TabsInstaller;
+use PrestaShop\Module\PsEditionBasic\Notification\Installer as NotificationsInstaller;
 use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 use PrestaShop\PrestaShop\Core\Cache\Clearer\CacheClearerInterface;
 
@@ -43,7 +44,7 @@ class ps_edition_basic extends Module
     public function __construct()
     {
         $this->name = 'ps_edition_basic';
-        $this->version = '1.3.3';
+        $this->version = '1.3.4';
         $this->tab = 'administration';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
@@ -93,6 +94,7 @@ class ps_edition_basic extends Module
 
         return parent::install()
             && (new TabsInstaller($this->name))->installTabs()
+            && NotificationsInstaller::install()
             && $this->registerHook($this->getHooksNames());
     }
 
@@ -118,6 +120,7 @@ class ps_edition_basic extends Module
     {
         Configuration::deleteByName('SMB_IS_NEW_MENU_ENABLED');
         Configuration::deleteByName(PrestaShop\Module\PsEditionBasic\Config\MenuModules::CONFIGURATION_KEY);
+        NotificationsInstaller::uninstall();
 
         return parent::uninstall()
             && (new Uninstall($this->name))->run();

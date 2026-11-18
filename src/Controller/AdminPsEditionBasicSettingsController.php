@@ -26,6 +26,10 @@ namespace PrestaShop\Module\PsEditionBasic\Controller;
 use PrestaShop\Module\PsEditionBasic\Config\Lists;
 use PrestaShop\Module\PsEditionBasic\Config\MenuModules;
 use PrestaShop\Module\PsEditionBasic\Helper\MenuTabs;
+use PrestaShop\Module\PsEditionBasic\Notification\Notifier;
+use PrestaShop\Module\PsEditionBasic\Notification\Settings;
+use PrestaShop\Module\PsEditionBasic\Notification\Subscriptions;
+use PrestaShop\Module\PsEditionBasic\Notification\WebPush;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -62,7 +66,156 @@ class AdminPsEditionBasicSettingsController extends AdminPsEditionBasicControlle
             'cards' => $this->settingsCards($tabs),
             'menuModules' => $this->menuModuleCards($tabs),
             'menuModulesUrl' => $this->getService('router')->generate('ps_edition_basic_menu_module'),
+            'notifications' => $this->notificationsVariables(),
         ];
+    }
+
+    /**
+     * The Notifications section: this browser's switch, and the settings the
+     * badge and the notifications follow.
+     *
+     * @return array<string, mixed>
+     */
+    private function notificationsVariables(): array
+    {
+        $router = $this->getService('router');
+        $validities = [
+            3600 => $this->translate('1 hour'),
+            21600 => $this->translate('6 hours'),
+            43200 => $this->translate('12 hours'),
+            86400 => $this->translate('24 hours'),
+            259200 => $this->translate('3 days'),
+            604800 => $this->translate('7 days'),
+        ];
+
+        return [
+            'kinds' => Settings::kinds(),
+            'background' => Settings::background(),
+            'text' => Settings::text(),
+            'validity' => Settings::validity(),
+            'validities' => array_intersect_key($validities, array_flip(Settings::VALIDITIES)),
+            'canEdit' => $this->granted('edit'),
+            'publicKey' => WebPush::publicKey(),
+            'worker' => $this->assetUrl('views/js/notifications-sw.js'),
+            'urls' => [
+                'save' => $router->generate('ps_edition_basic_notifications_save'),
+                'subscribe' => $router->generate('ps_edition_basic_push_subscribe'),
+                'unsubscribe' => $router->generate('ps_edition_basic_push_unsubscribe'),
+                'test' => $router->generate('ps_edition_basic_push_test'),
+            ],
+            'texts' => [
+                'title' => $this->translate('Notifications'),
+                'description' => $this->translate('Be told about new orders, customers and messages'),
+                'browser' => $this->translate('Notifications on this browser'),
+                'on' => $this->translate('This browser receives the notifications, even with the back office closed.'),
+                'off' => $this->translate('Turn them on to be told about new orders, customers and messages, even with the back office closed.'),
+                'denied' => $this->translate('Notifications are blocked for this site. Allow them in the browser settings, then reload the page.'),
+                'unsupported' => $this->translate('This browser cannot receive notifications. On iPhone and iPad, add the back office to the home screen first.'),
+                'insecure' => $this->translate('Notifications need the back office to open on a secure address (https).'),
+                'noServer' => $this->translate('This server cannot send notifications: PHP needs its OpenSSL and cURL extensions.'),
+                'turnOn' => $this->translate('Turn on'),
+                'turnOff' => $this->translate('Turn off'),
+                'test' => $this->translate('Send a test'),
+                'testSent' => $this->translate('Test sent: it shows in a few seconds.'),
+                'testFailed' => $this->translate('The test could not be sent. Turn the notifications off and on again.'),
+                'settings' => $this->translate('Notification settings'),
+                'settingsDescription' => $this->translate('What you are told about, the badge colors and how long a notification waits'),
+                'order' => $this->translate('New orders'),
+                'customer' => $this->translate('New customers'),
+                'customer_message' => $this->translate('New messages'),
+                'kindsHelp' => $this->translate('Counted on the icon of the browser tab, as the bell counts them, and sent as notifications.'),
+                'background' => $this->translate('Notification background color'),
+                'textColor' => $this->translate('Notification text color'),
+                'validity' => $this->translate('Validity'),
+                'validityHelp' => $this->translate('How long a notification waits for a browser that is offline. After that, it is dropped.'),
+                'save' => $this->getService('translator')->trans('Save', [], 'Admin.Actions'),
+                'saved' => $this->translate('The settings are saved.'),
+            ],
+        ];
+    }
+
+    public function saveNotificationsAction(Request $request): JsonResponse
+    {
+        if (!$this->granted('edit')) {
+            return new JsonResponse(['saved' => false], Response::HTTP_FORBIDDEN);
+        }
+        $kinds = [];
+        foreach (array_keys(Settings::kinds()) as $kind) {
+            $kinds[$kind] = (string) $request->request->get($kind, '0') === '1';
+        }
+        Settings::save(
+            $kinds,
+            (string) $request->request->get('background', ''),
+            (string) $request->request->get('text', ''),
+            (int) $request->request->get('validity', 0)
+        );
+
+        return new JsonResponse(['saved' => true]);
+    }
+
+    /**
+     * Keeps this browser for the employee, with the address of the back office
+     * as the browser reaches it: the notifications are sent from requests of
+     * the shop, which do not know where the back office is.
+     */
+    public function subscribeAction(Request $request): JsonResponse
+    {
+        if (!$this->granted('view')) {
+            return new JsonResponse(['saved' => false], Response::HTTP_FORBIDDEN);
+        }
+        $subscription = $this->subscription($request);
+        $keys = $subscription['keys'] ?? null;
+        if (!isset($subscription['endpoint'], $keys['p256dh'], $keys['auth']) || !is_string($subscription['endpoint'])
+            || !preg_match('#^https://#', $subscription['endpoint'])) {
+            return new JsonResponse(['saved' => false], Response::HTTP_BAD_REQUEST);
+        }
+        $adminUrl = $request->getSchemeAndHttpHost() . $request->getBasePath() . '/index.php?controller=' . Notifier::CONTROLLER;
+        $saved = Subscriptions::save(
+            (int) $this->legacyContext()->employee->id,
+            $subscription['endpoint'],
+            (string) $keys['p256dh'],
+            (string) $keys['auth'],
+            $adminUrl
+        );
+
+        return new JsonResponse(['saved' => $saved]);
+    }
+
+    public function unsubscribeAction(Request $request): JsonResponse
+    {
+        $subscription = $this->subscription($request);
+        if (isset($subscription['endpoint']) && is_string($subscription['endpoint'])) {
+            Subscriptions::delete($subscription['endpoint'], (int) $this->legacyContext()->employee->id);
+        }
+
+        return new JsonResponse(['saved' => true]);
+    }
+
+    public function testNotificationAction(Request $request): JsonResponse
+    {
+        $subscription = $this->subscription($request);
+        $employee = $this->legacyContext()->employee;
+        $row = isset($subscription['endpoint']) && is_string($subscription['endpoint'])
+            ? Subscriptions::find($subscription['endpoint'], (int) $employee->id)
+            : null;
+        if ($row === null) {
+            return new JsonResponse(['sent' => false], Response::HTTP_NOT_FOUND);
+        }
+        $row['id_lang'] = (int) $employee->id_lang;
+
+        return new JsonResponse(['sent' => Notifier::test($row)]);
+    }
+
+    /**
+     * The browser's subscription, as PushSubscription.toJSON() writes it.
+     *
+     * @return array<string, mixed>
+     */
+    private function subscription(Request $request): array
+    {
+        $data = json_decode((string) $request->getContent(), true);
+
+        return is_array($data) ? $data : [];
     }
 
     /**

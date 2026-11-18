@@ -68,6 +68,25 @@ class Tabs
                 'wording_domain' => 'Modules.Editionbasic.Admin',
                 'follows_menu' => true,
             ],
+            [
+                // Where a browser notification leads; never in the menu.
+                'class_name' => 'AdminPsEditionBasicNotification',
+                'route_name' => '',
+                'name' => [
+                    'en' => 'Notifications',
+                    'fr' => 'Notifications',
+                    'it' => 'Notifiche',
+                    'es' => 'Notificaciones',
+                ],
+                'icon' => '',
+                'parent' => '',
+                'position' => 0,
+                'active' => false,
+                'enabled' => true,
+                'wording' => '',
+                'wording_domain' => 'Modules.Editionbasic.Admin',
+                'follows_menu' => false,
+            ],
         ];
     }
 }

@@ -19,7 +19,8 @@
 
 /*
  * The settings page and the help center: the settings views that open in place,
- * the switches that show a module page in the menu, and the support offers slider.
+ * the switches that show a module page in the menu, the notifications of this
+ * browser and their settings, and the support offers slider.
  */
 (function () {
   'use strict';
@@ -119,6 +120,188 @@
       var step = track.firstElementChild ? track.firstElementChild.getBoundingClientRect().width + 30 : track.clientWidth;
       track.scrollBy({ left: arrow.classList.contains('peb-care__prev') ? -step : step, behavior: 'smooth' });
     }
+  });
+
+  // The notifications of this browser. A browser asks its push service for an
+  // address the shop can write to, which the shop keeps for the employee; the
+  // permission and the address belong to the browser, so each one is switched
+  // on where it is used.
+  function base64ToBytes(value) {
+    var padded = (value + '==='.slice((value.length + 3) % 4)).replace(/-/g, '+').replace(/_/g, '/');
+    var raw = window.atob(padded);
+    var bytes = new Uint8Array(raw.length);
+    for (var i = 0; i < raw.length; i++) {
+      bytes[i] = raw.charCodeAt(i);
+    }
+    return bytes;
+  }
+
+  function post(url, data) {
+    return fetch(url, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(function (response) {
+      return response.ok ? response.json() : {};
+    });
+  }
+
+  function push() {
+    var card = document.getElementById('peb-push');
+    if (!card) {
+      return;
+    }
+    var status = card.querySelector('[data-peb-push-status]');
+    var buttons = {
+      on: card.querySelector('[data-peb-push-on]'),
+      off: card.querySelector('[data-peb-push-off]'),
+      test: card.querySelector('[data-peb-push-test]')
+    };
+    var text = function (name) {
+      return card.getAttribute('data-text-' + name);
+    };
+    var state = function (name, subscribed) {
+      status.textContent = text(name);
+      buttons.on.hidden = name !== 'off';
+      buttons.off.hidden = !subscribed;
+      buttons.test.hidden = !subscribed;
+    };
+    var busy = function (on) {
+      Object.keys(buttons).forEach(function (key) {
+        buttons[key].disabled = on;
+      });
+    };
+
+    if (!window.isSecureContext) {
+      state('insecure', false);
+      return;
+    }
+    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
+      state('unsupported', false);
+      return;
+    }
+    if (!card.getAttribute('data-key')) {
+      state('no-server', false);
+      return;
+    }
+
+    var registration = navigator.serviceWorker.register(card.getAttribute('data-worker'));
+    var current = null;
+
+    var refresh = function () {
+      return registration.then(function (worker) {
+        return worker.pushManager.getSubscription();
+      }).then(function (subscription) {
+        current = subscription;
+        if (Notification.permission === 'denied') {
+          state('denied', false);
+        } else if (subscription) {
+          state('on', true);
+          // Told again on each visit: the shop forgets a browser whose push
+          // service stopped answering, and the browser may have a new address.
+          post(card.getAttribute('data-subscribe'), subscription.toJSON());
+        } else {
+          state('off', false);
+        }
+      });
+    };
+
+    refresh().catch(function () {
+      state('unsupported', false);
+    });
+
+    // Asked from the click itself: Safari and Firefox only show the
+    // permission prompt for a gesture of the user.
+    buttons.on.addEventListener('click', function () {
+      busy(true);
+      Notification.requestPermission().then(function (permission) {
+        if (permission !== 'granted') {
+          return refresh();
+        }
+        return registration.then(function (worker) {
+          return worker.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: base64ToBytes(card.getAttribute('data-key'))
+          });
+        }).then(function (subscription) {
+          return post(card.getAttribute('data-subscribe'), subscription.toJSON()).then(function (result) {
+            if (!result.saved) {
+              throw new Error('not saved');
+            }
+            return refresh();
+          });
+        });
+      }).catch(function () {
+        window.alert(card.getAttribute('data-error'));
+      }).finally(function () {
+        busy(false);
+      });
+    });
+
+    buttons.off.addEventListener('click', function () {
+      if (!current) {
+        return;
+      }
+      busy(true);
+      var subscription = current.toJSON();
+      current.unsubscribe().then(function () {
+        return post(card.getAttribute('data-unsubscribe'), subscription);
+      }).then(refresh).catch(function () {
+        window.alert(card.getAttribute('data-error'));
+      }).finally(function () {
+        busy(false);
+      });
+    });
+
+    buttons.test.addEventListener('click', function () {
+      if (!current) {
+        return;
+      }
+      busy(true);
+      post(card.getAttribute('data-test'), current.toJSON()).then(function (result) {
+        status.textContent = text(result.sent ? 'sent' : 'failed');
+      }).catch(function () {
+        status.textContent = text('failed');
+      }).finally(function () {
+        busy(false);
+      });
+    });
+  }
+
+  function notificationsForm() {
+    var form = document.getElementById('peb-notifications-form');
+    if (!form) {
+      return;
+    }
+    var saved = form.querySelector('[data-peb-saved]');
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      var button = form.querySelector('[type="submit"]');
+      button.disabled = true;
+      saved.hidden = true;
+      fetch(form.getAttribute('action'), { method: 'POST', body: new FormData(form), credentials: 'same-origin' })
+        .then(function (response) {
+          return response.ok ? response.json() : { saved: false };
+        })
+        .then(function (result) {
+          if (!result.saved) {
+            throw new Error('not saved');
+          }
+          saved.hidden = false;
+        })
+        .catch(function () {
+          window.alert(form.getAttribute('data-error'));
+        })
+        .finally(function () {
+          button.disabled = false;
+        });
+    });
+  }
+
+  ready(function () {
+    push();
+    notificationsForm();
   });
 
   window.addEventListener('popstate', function () {
