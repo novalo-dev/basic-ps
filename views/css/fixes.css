@@ -312,3 +312,31 @@ body:not(.display-modal) #content:is(.bootstrap, .nobootstrap) > .bootstrap:has(
 #order-sources-list b {
   font-weight: 600;
 }
+
+/*
+ * The column titles of a legacy list. A title and its two sort arrows are
+ * separate pieces of text, so a narrow column broke them apart: the arrows fell
+ * under the title, one per line, and the titles stood at different heights. The
+ * title wraps on its own now with its arrows beside it, and every title sits on
+ * the line above the filters, as in the lists of the newer pages.
+ */
+.table thead > tr.nodrag > th {
+  vertical-align: bottom;
+}
+.table thead > tr.nodrag > th .title_box {
+  /* Block-level, so a column stays as narrow as its longest word allows. */
+  display: flex;
+  /* The arrows follow the last line of a title that wraps. */
+  align-items: flex-end;
+  gap: .25rem;
+}
+.table thead > tr.nodrag > th.center .title_box,
+.table thead > tr.nodrag > th.text-center .title_box {
+  justify-content: center;
+}
+.table thead > tr.nodrag > th.text-right .title_box {
+  justify-content: flex-end;
+}
+.table thead > tr.nodrag > th .title_box > a {
+  flex: none;
+}
