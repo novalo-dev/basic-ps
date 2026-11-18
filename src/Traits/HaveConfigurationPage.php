@@ -133,7 +133,13 @@ trait HaveConfigurationPage
                 }
             }
 
-            $output = $this->displayConfirmation($this->trans('Settings updated', [], 'Modules.Editionbasic.Admin'));
+            // Back to the page by GET, where PrestaShop says the settings are
+            // saved: answering the POST itself made a reload send the form again.
+            \Tools::redirectAdmin(
+                $this->context->link->getAdminLink('AdminModules', false)
+                . '&configure=' . $this->name . '&tab_module=' . $this->tab . '&module_name=' . $this->name
+                . '&token=' . \Tools::getAdminTokenLite('AdminModules') . '&conf=6'
+            );
         }
 
         return $output;

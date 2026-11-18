@@ -56,6 +56,8 @@ class AdminPsEditionBasicHelpController extends AdminPsEditionBasicController
             'maintenanceUrl' => $this->legacyContext()->link->getAdminLink('AdminMaintenance'),
             'helpUrl' => 'https://help-center.prestashop.com/' . (self::HELP_CENTER[$language] ?? 'en'),
             'careUrl' => $care . '/54-support-offerings',
+            // The Care Center's home: its contact form and support are one click away.
+            'supportUrl' => $care,
             'images' => [
                 'help' => $this->assetUrl('views/img/help-center.svg'),
                 'offer' => $this->assetUrl('views/img/care-offer.png'),
@@ -72,6 +74,7 @@ class AdminPsEditionBasicHelpController extends AdminPsEditionBasicController
                 'helpDescription' => $this->translate('A question, a doubt about a feature? Consult the documentation of our'),
                 'helpCenter' => $this->translate('Help Center.'),
                 'helpButton' => $this->translate('Access the documentation'),
+                'supportButton' => $this->translate('Contact support'),
                 'careTitle' => $this->translate('THE HELP YOU NEED, WHEN YOU NEED IT'),
                 'careDescription' => $this->translate('Focus on your business. Let us take care of the technical aspects.'),
                 'careButton' => $this->translate('Discover our offers'),

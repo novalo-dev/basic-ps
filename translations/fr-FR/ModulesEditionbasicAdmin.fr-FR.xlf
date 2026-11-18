@@ -192,11 +192,6 @@
         <target state="translated">Activer le nouveau menu et le fil d'ariane</target>
         <note>Line: </note>
       </trans-unit>
-      <trans-unit id="c888438d14855d7d96a2724ee9c306bd">
-        <source>Settings updated</source>
-        <target state="translated">Paramètres mis à jour</target>
-        <note>Line: </note>
-      </trans-unit>
       <trans-unit id="ed56c088e223462171cc99f1a9b37785">
         <source>PrestaShop Edition Basic</source>
         <target state="translated">PrestaShop Edition Basic</target>
@@ -410,6 +405,11 @@
       <trans-unit id="9f099595077afc90c594eba23bd43a3d">
         <source>To unblock them, click the padlock at the left of the address, set Notifications to Allow, then reload the page.</source>
         <target state="translated">Pour les débloquer, cliquez sur le cadenas à gauche de l'adresse, passez Notifications sur Autoriser, puis rechargez la page.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ad119d5ea30f6c26b58e0af5bc43c9fe">
+        <source>Contact support</source>
+        <target state="translated">Contacter le support</target>
         <note>Line: </note>
       </trans-unit>
     </body>
