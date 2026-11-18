@@ -11,7 +11,7 @@
 | Back office look | PrestaShop 9 stylesheets, shipped in the module, replace the PrestaShop 8 ones; the login page gets the PrestaShop 9 look from a stylesheet of its own | unchanged: PrestaShop 9 already has it |
 | Simplified menu | optional, switched on in the module configuration | optional, switched on in the module configuration |
 | Settings page | cards for the sections the simplified menu leaves out | same |
-| Notifications | the bell's count on the browser tab's icon, and browser notifications for new orders, customers and messages | same |
+| Notifications | with the simplified menu: the bell's count on the browser tab's icon, and browser notifications for new orders, customers and messages | same |
 
 With the simplified menu on:
 
@@ -27,12 +27,15 @@ With the simplified menu on:
 
 ### Notifications
 
+They come with the simplified menu, like the settings page they are set on: with
+the menu off, no badge is drawn and nothing is sent.
+
 - The count of the bell at the top of the back office shows on the icon of the
   browser tab, for the kinds chosen in *Settings → Notifications*, in the colors set
   there. The script reads the bell's own answers and sends no request of its own.
 - Each employee switches notifications on per browser, on the settings page. They
-  arrive with every back office tab closed, in the employee's language, and only for
-  what the employee's profile may open; a click opens the order, the customer or the
+  arrive with every back office tab closed, in the employee's language, with the shop's favicon, and
+  only for what the employee's profile may open; a click opens the order, the customer or the
   message thread. Chrome, Edge, Firefox and Safari 16.4 or later; on iPhone and iPad,
   once the back office is added to the home screen. The back office must open on https.
 - They are sent with the Web Push protocol (VAPID keys created at install, aes128gcm

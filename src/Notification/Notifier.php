@@ -329,11 +329,14 @@ class Notifier
         }
     }
 
-    /** The shop's logo, which a browser shows beside the notification. */
+    /**
+     * The shop's favicon, which a browser shows beside the notification: the
+     * icon the employee knows the shop by, where a logo is cut down to a square.
+     */
     private static function icon(): string
     {
-        $logo = (string) \Configuration::get('PS_LOGO');
+        $favicon = (string) \Configuration::get('PS_FAVICON');
 
-        return $logo === '' ? '' : \Tools::getShopDomainSsl(true) . __PS_BASE_URI__ . 'img/' . $logo;
+        return $favicon === '' ? '' : \Tools::getShopDomainSsl(true) . __PS_BASE_URI__ . 'img/' . $favicon;
     }
 }

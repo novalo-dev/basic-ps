@@ -57,19 +57,27 @@ class Settings
     /** How long a push service keeps a notification for a browser that is offline, in seconds. */
     public const VALIDITIES = [3600, 21600, 43200, 86400, 259200, 604800];
 
+    /**
+     * Whether this kind is announced now. The notifications and the badge belong
+     * to the simplified menu, like the settings page they are set on: with the
+     * menu off, none is drawn or sent, and the browsers subscribed stay kept
+     * for when it is back.
+     */
     public static function enabled(string $kind): bool
     {
-        return isset(self::KEYS[$kind]) && (string) \Configuration::get(self::KEYS[$kind]) === '1';
+        return (bool) \Configuration::get('SMB_IS_NEW_MENU_ENABLED') && !empty(self::kinds()[$kind]);
     }
 
     /**
+     * The kinds as the merchant set them, menu or not.
+     *
      * @return array<string, bool>
      */
     public static function kinds(): array
     {
         $kinds = [];
-        foreach (array_keys(self::KEYS) as $kind) {
-            $kinds[$kind] = self::enabled($kind);
+        foreach (self::KEYS as $kind => $key) {
+            $kinds[$kind] = (string) \Configuration::get($key) === '1';
         }
 
         return $kinds;

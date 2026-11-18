@@ -50,7 +50,7 @@ trait UseDisplayBackOfficeHeader
      */
     private function faviconBadge(): string
     {
-        $kinds = array_keys(array_filter(Settings::kinds()));
+        $kinds = array_values(array_filter(array_keys(Settings::kinds()), [Settings::class, 'enabled']));
         if (!$kinds || !$this->context->controller) {
             return '';
         }
