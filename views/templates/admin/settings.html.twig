@@ -136,7 +136,7 @@
         </div>
 
         <div class="row" data-peb-view="notifications" data-title="{{ notifications.texts.settings }}" data-description="{{ notifications.texts.settingsDescription }}" hidden>
-            <div class="col-lg-8 mb-4">
+            <div class="col-12 mb-4">
                 <form class="card mb-0" id="peb-notifications-form" action="{{ notifications.urls.save }}" method="post" data-error="{{ texts.error }}">
                     <div class="card-body">
                         {% for kind, enabled in notifications.kinds %}
