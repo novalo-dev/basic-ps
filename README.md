@@ -55,9 +55,12 @@ receive the notifications.
 
 ## Getting a build
 
-There are no releases. Run **Actions → Build for Testing → Run workflow** and download
-the artifact: a zip with `ps_edition_basic/` at its root, ready to upload in
-*Modules → Module Manager → Upload a module*.
+There are no official releases. Two ways to get the zip, a folder `ps_edition_basic/`
+at its root, ready to upload in *Modules → Module Manager → Upload a module*:
+
+- **Actions → Build for Testing → Run workflow**, then download the artifact;
+- **Actions → Pre-release → Run workflow** publishes it as a GitHub pre-release,
+  tagged with the version of `config.xml`; a version already published is refused.
 
 ## Versions
 

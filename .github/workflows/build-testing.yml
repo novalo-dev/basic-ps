@@ -1,7 +1,7 @@
 name: Build for Testing
 
 # Builds the zip to install on a shop and keeps it as an artifact. Nothing is
-# ever published: there are no releases.
+# ever published: Pre-release publishes a build for testing.
 on:
   workflow_dispatch:
 

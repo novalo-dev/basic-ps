@@ -1,0 +1,70 @@
+name: Pre-release
+
+# Publishes the module zip as a GitHub pre-release, for testing on a shop: an
+# unofficial build, marked as such. Run by hand from the Actions tab on the
+# branch to publish; the tag is the version in config.xml, so a version already
+# published is refused rather than replaced.
+on:
+  workflow_dispatch:
+    inputs:
+      notes:
+        description: Release notes (empty for the list of commits since the last release)
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  pre-release:
+    name: Publish the pre-release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: composer
+      - name: Version
+        id: version
+        run: |
+          XML=$(sed -n 's#.*<version><!\[CDATA\[\(.*\)\]\]></version>.*#\1#p' config.xml)
+          PHP=$(sed -n "s#.*\$this->version = '\(.*\)';.*#\1#p" ps_edition_basic.php)
+          [ -n "$XML" ] && [ "$XML" = "$PHP" ] || { echo "::error::config.xml says $XML, ps_edition_basic.php says $PHP"; exit 1; }
+          echo "version=$PHP" >> "$GITHUB_OUTPUT"
+      - name: The version is not published yet
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if gh release view "v$VERSION" > /dev/null 2>&1 || git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" > /dev/null; then
+            echo "::error::v$VERSION already exists: raise the version to publish another build."
+            exit 1
+          fi
+      - name: Build
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          dev/package/build.sh "$RUNNER_TEMP/pack"
+          cd "$RUNNER_TEMP/pack"
+          zip -qr "$RUNNER_TEMP/ps_edition_basic-$VERSION.zip" ps_edition_basic
+          # The zip a shop uploads: the module folder at its root, no plumbing.
+          unzip -l "$RUNNER_TEMP/ps_edition_basic-$VERSION.zip" | grep -q ' ps_edition_basic/ps_edition_basic.php$' \
+            || { echo "::error::The module is missing from the zip"; exit 1; }
+          if unzip -l "$RUNNER_TEMP/ps_edition_basic-$VERSION.zip" | grep -qE ' ps_edition_basic/(\.github|dev)/'; then
+            echo "::error::The zip carries the repository's plumbing"; exit 1
+          fi
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+          NOTES: ${{ inputs.notes }}
+        run: |
+          set -- "v$VERSION" "$RUNNER_TEMP/ps_edition_basic-$VERSION.zip" \
+            --target "$GITHUB_SHA" --prerelease --title "$VERSION (pre-release)"
+          if [ -n "$NOTES" ]; then
+            gh release create "$@" --notes "$NOTES"
+          else
+            gh release create "$@" --generate-notes
+          fi
