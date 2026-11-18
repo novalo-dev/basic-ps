@@ -70,7 +70,9 @@ class Ps9ThemeSubscriber implements EventSubscriberInterface
         }
 
         $module = \Module::getInstanceByName('ps_edition_basic');
-        if (!$module instanceof \ps_edition_basic || !\Module::isEnabled('ps_edition_basic')) {
+        // The module's own test: without the files of the look, as in the
+        // PrestaShop 9 zip, there is nothing to rewrite with.
+        if (!$module instanceof \ps_edition_basic || !\Module::isEnabled('ps_edition_basic') || !$module->isPrestaShop8()) {
             return;
         }
 

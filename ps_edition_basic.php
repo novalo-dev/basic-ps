@@ -47,7 +47,7 @@ class ps_edition_basic extends Module
     public function __construct()
     {
         $this->name = 'ps_edition_basic';
-        $this->version = '1.4.3';
+        $this->version = '1.4.4';
         $this->tab = 'administration';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
@@ -160,10 +160,14 @@ class ps_edition_basic extends Module
     /**
      * PrestaShop 8 gets the PrestaShop 9 look on top of the menu and the settings
      * page; PrestaShop 9 already has that look, so there it only gets those two.
+     *
+     * The PrestaShop 9 zip leaves out the files of that look. Uploaded by mistake
+     * over the module of a PrestaShop 8 shop, it then works as on PrestaShop 9,
+     * without the look, instead of reaching for files it does not have.
      */
     public function isPrestaShop8(): bool
     {
-        return version_compare(_PS_VERSION_, '9.0.0', '<');
+        return version_compare(_PS_VERSION_, '9.0.0', '<') && is_dir(__DIR__ . '/views/ps9');
     }
 
     /**

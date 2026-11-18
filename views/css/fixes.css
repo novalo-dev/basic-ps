@@ -174,6 +174,14 @@ body:not(.display-modal) #content:is(.bootstrap, .nobootstrap) > .bootstrap > .p
   order: -1;
 }
 
+/* In a column, a box centred by auto margins shrinks to its content instead of
+   filling the page as it does in the page's flow: a module's container-fluid
+   stood in the middle of the screen. Bootstrap's containers get their width
+   back, and a .container keeps its maximum width, still centred. */
+body:not(.display-modal) #content:is(.bootstrap, .nobootstrap) > :is(.container, .container-fluid) {
+  width: 100%;
+}
+
 /* A module's configuration page draws the module manager's header, then its own
    over it: only the module's shows, as when both were fixed. */
 body:not(.display-modal) #content:is(.bootstrap, .nobootstrap) > .bootstrap:has(~ .bootstrap > .page-head) > .page-head {
@@ -339,4 +347,17 @@ body:not(.display-modal) #content:is(.bootstrap, .nobootstrap) > .bootstrap:has(
 }
 .table thead > tr.nodrag > th .title_box > a {
   flex: none;
+}
+
+/*
+ * E-mail addresses stay whole: the newer lists cut them in pieces to fit. A
+ * newer list too wide for the page then scrolls inside its own card, as it
+ * already can. The older lists are left to widen the page: inside a scrolling
+ * card, the menu of a row's last button would be cut off by the card's edge.
+ */
+.table td.column-email,
+.grid-table td.column-email {
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: normal;
 }
