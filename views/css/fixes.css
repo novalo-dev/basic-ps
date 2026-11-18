@@ -250,3 +250,31 @@ body:not(.display-modal) #content:is(.bootstrap, .nobootstrap) > .bootstrap:has(
 #content.bootstrap .table thead > tr > th .title_box {
   white-space: normal;
 }
+
+/*
+ * The Sources of an order: PrestaShop 8 writes their list inside the card's
+ * header, which the PrestaShop 9 stylesheet sets as a title, so every visit
+ * read in large bold type. PrestaShop 9.1 moved the list into the card's body;
+ * here it gets the body's type back, one visit a row.
+ */
+#order-sources-list {
+  flex: 0 0 100%;
+  max-width: 100%;
+  margin: var(--cdk-size-12, .75rem) 0 0;
+  padding: 0 15px;
+  list-style: none;
+  font-size: .875rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+#order-sources-list > li {
+  padding: var(--cdk-size-8, .5rem) 0;
+  border-top: 1px solid var(--cdk-primary-300, #eeeeee);
+  word-break: break-all;
+}
+#order-sources-list > li > br:last-child {
+  display: none;
+}
+#order-sources-list b {
+  font-weight: 600;
+}
