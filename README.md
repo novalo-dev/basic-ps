@@ -72,7 +72,8 @@ Each change moves the last digit by one; a digit past 9 carries over:
 
 ## Licence
 
-Academic Free License 3.0, like the original module by PrestaShop SA. The PrestaShop 9
+Academic Free License 3.0, like the original module by PrestaShop SA; the text is in
+`LICENSE.md`, shipped in the zip. The PrestaShop 9
 stylesheets in `views/ps9` come from the PrestaShop 9.0.0 back office themes.
 
 Each file says whose it is. A file of the original module keeps PrestaShop SA's
