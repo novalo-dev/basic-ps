@@ -140,6 +140,18 @@ body:not(.display-modal) #content.nobootstrap > .bootstrap > .page-head {
   margin-left: -30px;
 }
 
+/* PrestaShop writes a page's messages (saved, errors, warnings) before its
+   header; PrestaShop 9 fixes the header, so they show under it. Kept in the
+   page's flow here, the header would follow them: it moves back to the top. */
+body:not(.display-modal) #content:is(.bootstrap, .nobootstrap):has(> .bootstrap > .page-head) {
+  display: flex;
+  flex-direction: column;
+}
+
+body:not(.display-modal) #content:is(.bootstrap, .nobootstrap) > .bootstrap > .page-head {
+  order: -1;
+}
+
 /* A module's configuration page draws the module manager's header, then its own
    over it: only the module's shows, as when both were fixed. */
 body:not(.display-modal) #content:is(.bootstrap, .nobootstrap) > .bootstrap:has(~ .bootstrap > .page-head) > .page-head {
