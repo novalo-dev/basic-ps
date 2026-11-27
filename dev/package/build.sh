@@ -21,10 +21,9 @@ rm -rf "$DEST"
 mkdir -p "$DEST"
 git -C "$ROOT" archive "$REF" | tar -x -C "$DEST"
 if [ "$TARGET" = 9 ]; then
-  # Every one of these is reached only behind isPrestaShop8() or a version check.
-  rm -rf "$DEST/views/ps9" "$DEST/src/Theme/Ps9Theme.php" \
-    "$DEST/views/css/fixes.css" "$DEST/views/css/login.css" \
-    "$DEST/views/js/favicon.js" "$DEST/views/js/ps9-fixes.js" "$DEST/views/favicon.png"
+  # Each of these is asked for only behind hasPrestaShop8Look().
+  rm -f "$DEST/views/css/back.css" "$DEST/views/css/fonts.css" \
+    "$DEST"/views/fonts/*.woff2 "$DEST/views/fonts/LICENSE-IBM-Plex-Sans.txt"
   FROM="'min' => '8.0.0'"
   grep -q "$FROM" "$DEST/ps_edition_basic.php" \
     || { echo "The versions the module declares are no longer written as expected" >&2; exit 1; }

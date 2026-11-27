@@ -148,6 +148,15 @@
 }
 
 /*
+ * On a legacy page of PrestaShop 8 the theme paints the links of the page head
+ * white, for the dark head it once had: the simplified breadcrumb sits there
+ * and keeps the colour of its links.
+ */
+.page-head .breadcrumb .peb-breadcrumb .puik-link {
+  color: #1d1d1b !important;
+}
+
+/*
  * An open section. Its pages have no height limit: the design system's 24rem
  * cut off the end of long sections, such as a catalogue extended by modules.
  */

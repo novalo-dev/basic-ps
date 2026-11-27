@@ -27,11 +27,9 @@ namespace PrestaShop\Module\PsEditionBasic\Traits;
 trait UseHooks
 {
     use Hooks\UseActionAdminMenuTabsModifier;
-    use Hooks\UseActionAdminControllerInitBefore;
     use Hooks\UseActionAdminBreadcrumbModifier;
     use Hooks\UseActionObjectLanguageAddAfter;
     use Hooks\UseActionAdminControllerSetMedia;
-    use Hooks\UseActionAdminLoginControllerSetMedia;
     use Hooks\UseDisplayBackOfficeHeader;
     use Hooks\UseDisplayAdminNavBarBeforeEnd;
     use Hooks\UseDisplayDashboardTop;

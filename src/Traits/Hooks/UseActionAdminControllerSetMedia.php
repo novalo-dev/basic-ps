@@ -46,19 +46,14 @@ trait UseActionAdminControllerSetMedia
             $this->updateModuleTabsNames();
         }
 
-        if (!$this->isPrestaShop8()) {
-            return;
-        }
-
-        // The controller has registered its theme stylesheets by now, iframes included:
-        // they are swapped for the PS 9 build in place, keeping their order. On
-        // PrestaShop 8 this hook only ever comes from AdminController::setMedia().
+        // PrestaShop 9 has this look of its own. PrestaShop 8 gets it from the
+        // stylesheet PrestaShop wrote for it in PrestaShop Edition Basic, laid
+        // over the theme of the shop, which stays in place.
         $controller = $this->context->controller;
-        if (!$controller instanceof \AdminController) {
-            return;
+        if ($this->hasPrestaShop8Look() && $controller instanceof \AdminController) {
+            $controller->addCSS($this->getAssetUrl('views/css/fonts.css'));
+            $controller->addCSS($this->getAssetUrl('views/css/back.css'));
         }
-        $controller->css_files = (new \PrestaShop\Module\PsEditionBasic\Theme\Ps9Theme($this))->swapCssFiles($controller->css_files);
-        $controller->addCSS($this->getAssetUrl('views/css/fixes.css'));
     }
 
     /**

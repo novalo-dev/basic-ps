@@ -47,7 +47,7 @@ class ps_edition_basic extends Module
     public function __construct()
     {
         $this->name = 'ps_edition_basic';
-        $this->version = '1.4.5';
+        $this->version = '1.4.6';
         $this->tab = 'administration';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
@@ -146,28 +146,24 @@ class ps_edition_basic extends Module
         return parent::disable($force_all);
     }
 
-    private function addAdminThemeMedia(): void
-    {
-        $controller = $this->context->controller;
-        if (!$this->isPrestaShop8() || !$controller instanceof AdminController) {
-            return;
-        }
-
-        $controller->addJS($this->getAssetUrl('views/js/favicon.js'));
-        $controller->addJS($this->getAssetUrl('views/js/ps9-fixes.js'));
-    }
-
     /**
-     * PrestaShop 8 gets the PrestaShop 9 look on top of the menu and the settings
-     * page; PrestaShop 9 already has that look, so there it only gets those two.
-     *
-     * The PrestaShop 9 zip leaves out the files of that look. Uploaded by mistake
-     * over the module of a PrestaShop 8 shop, it then works as on PrestaShop 9,
-     * without the look, instead of reaching for files it does not have.
+     * PrestaShop 8 differs on two points. It gets the look PrestaShop 9 has of
+     * its own, from one stylesheet laid over its theme; and it draws its
+     * breadcrumb from the menu, so the simplified menu brings its own there.
      */
     public function isPrestaShop8(): bool
     {
-        return version_compare(_PS_VERSION_, '9.0.0', '<') && is_dir(__DIR__ . '/views/ps9');
+        return version_compare(_PS_VERSION_, '9.0.0', '<');
+    }
+
+    /**
+     * The PrestaShop 9 zip leaves the stylesheet of the look out. Uploaded by
+     * mistake over the module of a PrestaShop 8 shop, it then draws the menu
+     * without the look, instead of asking for a file it does not have.
+     */
+    public function hasPrestaShop8Look(): bool
+    {
+        return $this->isPrestaShop8() && is_file(__DIR__ . '/views/css/back.css');
     }
 
     /**

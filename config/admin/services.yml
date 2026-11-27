@@ -2,11 +2,6 @@ imports:
   - { resource: ../services.yml }
 
 services:
-  PrestaShop\Module\PsEditionBasic\EventSubscriber\Ps9ThemeSubscriber:
-    class: PrestaShop\Module\PsEditionBasic\EventSubscriber\Ps9ThemeSubscriber
-    tags:
-      - { name: kernel.event_subscriber }
-
   # PrestaShop 9 (Symfony 6.4) only hands its container to a controller declared
   # as a service: autowiring calls the @required setContainer(). PrestaShop 8
   # resolves the same controllers either way.

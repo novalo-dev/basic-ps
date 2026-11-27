@@ -25,57 +25,30 @@ declare(strict_types=1);
 
 namespace PrestaShop\Module\PsEditionBasic\EventSubscriber;
 
-use PrestaShop\Module\PsEditionBasic\Theme\Ps9Theme;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Swaps the theme stylesheets that Symfony back office pages print from their own
- * templates, which the actionAdminControllerSetMedia hook never sees.
+ * Does nothing any more: it swapped the stylesheets of PrestaShop 8 for those
+ * of PrestaShop 9, which the module no longer does.
+ *
+ * The class stays for the shops that update in place. Their compiled container
+ * still names it until the cache is rebuilt, and the request that uploads the
+ * new files ends by asking for it: without the class that request, and every
+ * page after it, fails.
  */
 class Ps9ThemeSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {
-        return [KernelEvents::RESPONSE => 'onKernelResponse'];
+        return [];
     }
 
     /**
-     * Typed loosely: the event class is FilterResponseEvent before Symfony 4.3
-     * and ResponseEvent after, and the module runs on both PrestaShop 8 and 9.
+     * Still called by a container compiled before the update.
      *
      * @param object $event
      */
     public function onKernelResponse($event): void
     {
-        // PrestaShop 9 already serves these stylesheets itself.
-        if (version_compare(_PS_VERSION_, '9.0.0', '>=')) {
-            return;
-        }
-
-        $isMain = method_exists($event, 'isMainRequest') ? $event->isMainRequest() : $event->isMasterRequest();
-        if (!$isMain) {
-            return;
-        }
-
-        $response = $event->getResponse();
-        $contentType = (string) $response->headers->get('Content-Type', 'text/html');
-        if (stripos($contentType, 'text/html') === false) {
-            return;
-        }
-
-        $content = $response->getContent();
-        if (!is_string($content) || strpos($content, '/public/') === false) {
-            return;
-        }
-
-        $module = \Module::getInstanceByName('ps_edition_basic');
-        // The module's own test: without the files of the look, as in the
-        // PrestaShop 9 zip, there is nothing to rewrite with.
-        if (!$module instanceof \ps_edition_basic || !\Module::isEnabled('ps_edition_basic') || !$module->isPrestaShop8()) {
-            return;
-        }
-
-        $response->setContent((new Ps9Theme($module))->rewriteHtml($content));
     }
 }

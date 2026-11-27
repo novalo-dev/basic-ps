@@ -60,8 +60,8 @@ jobs:
               echo "::error::The PrestaShop $TARGET zip carries the repository's plumbing"; exit 1
             fi
           done
-          if unzip -l "$RUNNER_TEMP/ps_edition_basic-$VERSION-ps9.zip" | grep -q ' ps_edition_basic/views/ps9/'; then
-            echo "::error::The PrestaShop 9 zip carries the PrestaShop 8 stylesheets"; exit 1
+          if unzip -l "$RUNNER_TEMP/ps_edition_basic-$VERSION-ps9.zip" | grep -q ' ps_edition_basic/views/css/back.css$'; then
+            echo "::error::The PrestaShop 9 zip carries the stylesheet of the PrestaShop 8 look"; exit 1
           fi
       - name: Publish
         env:

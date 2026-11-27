@@ -8,7 +8,7 @@
 
 | | PrestaShop 8 | PrestaShop 9 |
 |---|---|---|
-| Back office look | PrestaShop 9 stylesheets, shipped in the module, replace the PrestaShop 8 ones; the login page gets the PrestaShop 9 look from a stylesheet of its own | unchanged: PrestaShop 9 already has it |
+| Back office look | the stylesheet PrestaShop wrote for PrestaShop 8 in PrestaShop Edition Basic, laid over the theme of the shop, which stays in place; the login page is unchanged | unchanged: PrestaShop 9 already has it |
 | Simplified menu | optional, switched on in the module configuration | optional, switched on in the module configuration |
 | Settings page | cards for the sections the simplified menu leaves out | same |
 | Notifications | with the simplified menu: the bell's count on the browser tab's icon, and browser notifications for new orders, customers and messages | same |
@@ -63,8 +63,8 @@ There are no official releases. Each build comes as two zips, each with a folder
 Upload a module*:
 
 - **ps8**: the whole module. It runs on PrestaShop 8 and 9.
-- **ps9**: without what only PrestaShop 8 uses to look like PrestaShop 9 (the copied
-  PrestaShop 9 stylesheets, most of the weight), and PrestaShop refuses it below 9.0.
+- **ps9**: without what only PrestaShop 8 uses to look like PrestaShop 9 (the
+  stylesheet of the look and its font), and PrestaShop refuses it below 9.0.
 
 Two ways to get them:
 
@@ -80,8 +80,10 @@ Each change moves the last digit by one; a digit past 9 carries over:
 ## Licence
 
 Academic Free License 3.0, like the original module by PrestaShop SA; the text is in
-`LICENSE.md`, shipped in the zip. The PrestaShop 9
-stylesheets in `views/ps9` come from the PrestaShop 9.0.0 back office themes.
+`LICENSE.md`, shipped in the zip. `views/css/back.css` is the stylesheet of
+PrestaShop Edition Basic (PrestaShopCorp/ps_edition_basic), without its import of
+the font from Google Fonts: IBM Plex Sans ships in `views/fonts`, under the SIL
+Open Font License 1.1.
 
 Each file says whose it is. A file of the original module keeps PrestaShop SA's
 notice; one changed here adds Novalo's beside it, for the changes only; one written

@@ -413,13 +413,14 @@ const lookChecks = async () => {
         console.log(`::warning title=Look on PrestaShop 9::${step}: ${clashes.join('; ')}`);
     }
     const core = state.sheets.filter((href) => /\/themes\/(new-theme|default)\/public\/theme\.css/.test(href));
-    const ours = state.sheets.filter((href) => href.includes('/modules/ps_edition_basic/views/ps9/'));
+    const ours = state.sheets.filter((href) => href.includes('/modules/ps_edition_basic/views/css/back.css'));
     if (isPs8) {
+        // The look is one stylesheet laid over the theme of PrestaShop 8, which stays.
         if (ours.length === 0) {
-            throw new Error('the PrestaShop 9 stylesheet of the module is not loaded');
+            throw new Error('the stylesheet of the look is not loaded');
         }
-        if (core.length > 0) {
-            throw new Error(`the PrestaShop 8 stylesheet is still loaded: ${core.join(', ')}`);
+        if (core.length === 0) {
+            throw new Error('the stylesheet of PrestaShop 8 is no longer loaded');
         }
         if (state.notice !== 'none') {
             throw new Error('the mobile notice shows on a desktop screen');
@@ -458,11 +459,11 @@ const lookChecks = async () => {
 
 const signedIn = await check('sign in to the back office', async () => {
     await page.goto(adminUrl);
-    // The login page skips the back office media: on PrestaShop 8 the module
-    // gives it the PrestaShop 9 look with a stylesheet of its own.
-    const loginStyle = await page.locator('link[href*="/modules/ps_edition_basic/views/css/login.css"]').count();
-    if (isPs8 !== (loginStyle > 0)) {
-        throw new Error(isPs8 ? 'the login page misses the PrestaShop 9 look' : 'the module styles the PrestaShop 9 login page');
+    // The login page keeps the look of its PrestaShop version: the stylesheet
+    // of the look does not cover it, and the module has none of its own for it.
+    const loginStyle = await page.locator('link[href*="/modules/ps_edition_basic/"]').count();
+    if (loginStyle > 0) {
+        throw new Error('the module styles the login page');
     }
     await view('0-login');
     await page.locator('input[type="email"]').first().fill(email);

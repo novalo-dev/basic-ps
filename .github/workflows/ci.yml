@@ -149,7 +149,7 @@ jobs:
         run: |
           dev/package/build.sh "$RUNNER_TEMP/pack9" 9
           cd "$RUNNER_TEMP/pack9/ps_edition_basic"
-          [ ! -e views/ps9 ] || { echo "::error::views/ps9 is in the PrestaShop 9 folder"; exit 1; }
+          [ ! -e views/css/back.css ] || { echo "::error::views/css/back.css is in the PrestaShop 9 folder"; exit 1; }
           grep -q "'min' => '9.0.0'" ps_edition_basic.php || { echo "::error::the PrestaShop 9 folder does not ask for PrestaShop 9"; exit 1; }
           MISSING=$(find . -type d ! -exec test -e '{}/index.php' ';' -print)
           [ -z "$MISSING" ] || { echo "$MISSING" | sed 's/^/::error::index.php missing in /'; exit 1; }
